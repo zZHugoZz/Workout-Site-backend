@@ -1,51 +1,89 @@
-from os import access
-from fastapi import Depends, status, HTTPException
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
-from sqlalchemy.orm import Session
-from typing import Annotated
+from fastapi import HTTPException, status
+import jwt
 from datetime import datetime, timedelta
-from . import schemas
-from .database import get_db
-from . import models
 from .config import settings
+from . import models
 
 
 SECRET_KEY = settings.secret_key
+REFRESH_SECRET_KEY = settings.refresh_secret_key
 ALGORITHM = settings.algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-
-
-def create_access_token(data: dict):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+REFRESH_TOKEN_EXPIRE_MINUTES = settings.refresh_token_expire_minutes
 
 
-def verify_token(token: str, credentials_exception):
+def encode_token(user_id):
+    payload = {
+        "exp": datetime.utcnow()
+        + timedelta(days=0, minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        "iat": datetime.utcnow(),
+        "scope": "access_token",
+        "sub": user_id,
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def decode_token(token):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("user_id")
-        if user_id is None:
-            raise credentials_exception
-        token_data = schemas.TokenData(user_id=user_id)
-    except JWTError:
-        raise credentials_exception
-    return token_data
+        if payload["scope"] == "access_token":
+            return payload["sub"]
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Scope for the token is invalid",
+        )
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired"
+        )
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+        )
 
 
-def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)
-):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    access_token = verify_token(token, credentials_exception)
-    user = db.query(models.User).filter(models.User.id == access_token.user_id).first()
-    return user
+def encode_refresh_token(user_id):
+    payload = {
+        "exp": datetime.utcnow()
+        + timedelta(days=0, minutes=REFRESH_TOKEN_EXPIRE_MINUTES),
+        "iat": datetime.utcnow(),
+        "scope": "refresh_token",
+        "sub": user_id,
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def get_new_access_token(refresh_token, db):
+    try:
+        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload["scope"] == "refresh_token":
+            if (
+                db.query(models.BlackListedToken)
+                .filter(models.BlackListedToken.token == refresh_token)
+                .first()
+                is not None
+            ):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid token"
+                )
+
+            user_id = payload["sub"]
+            new_token = encode_token(user_id)
+            new_refresh_token = encode_refresh_token(user_id)
+            used_token = models.BlackListedToken(token=refresh_token)
+            db.add(used_token)
+            db.commit()
+            return {"access_token": new_token, "refresh_token": new_refresh_token}
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid scope for token"
+        )
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token expired"
+        )
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token"
+        )

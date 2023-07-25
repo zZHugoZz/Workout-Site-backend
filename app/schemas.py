@@ -4,7 +4,6 @@ from datetime import datetime
 
 class BaseUser(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
     username: str
     email: EmailStr
 
@@ -20,16 +19,20 @@ class UserOut(BaseUser):
 
 class Token(BaseModel):
     access_token: str
-    token_type: str
+    refresh_token: str
 
 
 class TokenData(BaseModel):
-    user_id: int | None = None
+    user_id: int
+
+
+class RefreshToken(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    refresh_token: str
 
 
 class Exercise(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
     id: int
     name: str
     link: str
@@ -37,7 +40,6 @@ class Exercise(BaseModel):
 
 class WorkoutExercise(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
     id: int
     name: str
     n_sets: int
@@ -49,7 +51,6 @@ class WorkoutExercise(BaseModel):
 
 class Workout(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
     id: int
     created_at: datetime
     user_id: int
