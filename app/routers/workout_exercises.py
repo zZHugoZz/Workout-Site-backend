@@ -19,7 +19,6 @@ def create_workout_exercise(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    print(exercise)
     token = credentials.credentials
     if decode_token(token):
         created_exercise = models.WorkoutExercise(**exercise.model_dump())
