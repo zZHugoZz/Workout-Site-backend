@@ -79,7 +79,7 @@ class Program(Base):
     days = relationship("ProgramDay")
 
 
-class ProgamDay(Base):
+class ProgramDay(Base):
     __tablename__ = "program_days"
 
     id = Column(Integer, primary_key=True, nullable=False)

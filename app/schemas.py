@@ -1,8 +1,5 @@
 from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
-from app.models import ProgamDay
-
-from app.routers import exercises
 
 
 class BaseUser(BaseModel):
@@ -81,13 +78,19 @@ class ProgramExercise(BaseModel):
 
 
 class ProgramDay(BaseModel):
-    id: int | None = None
+    id: int
     program_id: int
     exercises: list[ProgramExercise]
 
 
+class ProgramIn(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    name: str
+
+
 class Program(BaseModel):
-    id: int | None = None
+    id: int
     name: str
     user_id: int
-    days: list[ProgamDay]
+    days: list[ProgramDay]
+    created_at: datetime
