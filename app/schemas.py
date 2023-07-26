@@ -39,11 +39,20 @@ class Exercise(BaseModel):
 
 
 class WorkoutExercise(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
-    n_sets: int
-    n_reps: int
+    sets: int
+    reps: int
+    weight: float
+    unit: str
+    workout_id: int
+
+
+class WorkoutExerciseIn(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    name: str
+    sets: int
+    reps: int
     weight: float
     unit: str
     workout_id: int

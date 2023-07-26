@@ -13,10 +13,11 @@ router = APIRouter(prefix="/workouts", tags=["Workouts"])
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=list[schemas.Workout])
 def get_workouts(
+    credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    workouts = db.query(models.Workout).all()
-    print(workouts)
+    user_id = decode_token(credentials.credentials)
+    workouts = db.query(models.Workout).filter(models.Workout.user_id == user_id).all()
     return workouts
 
 
@@ -29,22 +30,27 @@ def get_workout(
     db: Session = Depends(get_db),
 ):
     token = credentials.credentials
-    if decode_token(token):
-        print(decode_token(token))
-        workout_query = db.query(models.Workout).filter(models.Workout.id == workout_id)
-        if workout_query.first() is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Workout with id: {workout_id} doesn't exist",
-            )
-        return workout_query.first()
+    workout_query = db.query(models.Workout).filter(models.Workout.id == workout_id)
+    if workout_query.first() is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Workout with id: {workout_id} doesn't exist",
+        )
+    if workout_query.first().user_id != decode_token(token):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Unhauthorized to perform this action",
+        )
+    return workout_query.first()
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Workout)
 def create_workout(
+    credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    created_workout = models.Workout()
+    user_id = decode_token(credentials.credentials)
+    created_workout = models.Workout(user_id=user_id)
     db.add(created_workout)
     db.commit()
     db.refresh(created_workout)
@@ -54,13 +60,20 @@ def create_workout(
 @router.delete("/{workout_id}", status_code=status.HTTP_200_OK)
 def delete_workout(
     workout_id: int,
+    credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
+    token = credentials.credentials
     workout_query = db.query(models.Workout).filter(models.Workout.id == workout_id)
     if workout_query.first() is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Workout with id: {workout_id} doesn't exist",
+        )
+    if workout_query.first().user_id != decode_token(token):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Unhauthorized to perform this action",
         )
     workout_query.delete()
     db.commit()

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from . import models
 from .database import engine
-from .routers import users, exercises, authentication, workouts
+from .routers import users, exercises, authentication, workouts, workout_exercises
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -22,3 +22,4 @@ app.include_router(users.router)
 app.include_router(exercises.router)
 app.include_router(authentication.router)
 app.include_router(workouts.router)
+app.include_router(workout_exercises.router)

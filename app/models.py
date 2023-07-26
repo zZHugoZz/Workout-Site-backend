@@ -30,8 +30,8 @@ class WorkoutExercise(Base):
 
     id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String(100), nullable=False)
-    n_sets = Column(Integer, nullable=False)
-    n_reps = Column(Integer, nullable=False)
+    sets = Column(Integer, nullable=False)
+    reps = Column(Integer, nullable=False)
     weight = Column(Float(precision=1), nullable=False)
     unit = Column(String, nullable=False)
     created_at = Column(
