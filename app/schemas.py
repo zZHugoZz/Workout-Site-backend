@@ -1,5 +1,8 @@
 from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
+from app.models import ProgamDay
+
+from app.routers import exercises
 
 
 class BaseUser(BaseModel):
@@ -65,3 +68,26 @@ class Workout(BaseModel):
     user_id: int
     user: UserOut
     exercises: list[WorkoutExercise]
+
+
+class ProgramExercise(BaseModel):
+    id: int | None = None
+    name: str
+    min_sets: int
+    max_sets: int
+    min_reps: int
+    max_reps: int
+    day_id: int
+
+
+class ProgramDay(BaseModel):
+    id: int | None = None
+    program_id: int
+    exercises: list[ProgramExercise]
+
+
+class Program(BaseModel):
+    id: int | None = None
+    name: str
+    user_id: int
+    days: list[ProgamDay]
