@@ -29,16 +29,16 @@ def get_workout(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    token = credentials.credentials
+    user_id = decode_token(credentials.credentials)
     workout_query = db.query(models.Workout).filter(models.Workout.id == workout_id)
     if workout_query.first() is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Workout with id: {workout_id} doesn't exist",
         )
-    if workout_query.first().user_id != decode_token(token):
+    if workout_query.first().user_id != user_id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unhauthorized to perform this action",
         )
     return workout_query.first()
@@ -63,16 +63,16 @@ def delete_workout(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    token = credentials.credentials
+    user_id = decode_token(credentials.credentials)
     workout_query = db.query(models.Workout).filter(models.Workout.id == workout_id)
     if workout_query.first() is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Workout with id: {workout_id} doesn't exist",
         )
-    if workout_query.first().user_id != decode_token(token):
+    if workout_query.first().user_id != user_id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unhauthorized to perform this action",
         )
     workout_query.delete()
