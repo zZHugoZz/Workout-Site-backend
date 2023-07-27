@@ -21,12 +21,7 @@ def create_workout_exercise(
     db: Session = Depends(get_db),
 ):
     user_id = decode_token(credentials.credentials)
-    workout_query = db.query(models.Workout).filter(
-        models.Workout.id == exercise.workout_id
-    )
-    if workout_query.first().user_id != user_id:
-        raise FORBIDDEN_EXCEPTION
-    created_exercise = models.WorkoutExercise(**exercise.model_dump())
+    created_exercise = models.WorkoutExercise(**exercise.model_dump(), user_id=user_id)
     db.add(created_exercise)
     db.commit()
     db.refresh(created_exercise)
@@ -48,10 +43,7 @@ def delete_workout_exercise(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Exercise with id: {workout_exercise_id} doesn't exist",
         )
-    workout_query = db.query(models.Workout).filter(
-        models.Workout.id == workout_exercise_query.first().workout_id
-    )
-    if workout_query.first().user_id != user_id:
+    if workout_exercise_query.first().user_id != user_id:
         return FORBIDDEN_EXCEPTION
     workout_exercise_query.delete()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

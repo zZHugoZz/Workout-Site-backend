@@ -62,6 +62,7 @@ class WorkoutExercise(Base):
     workout_id = Column(
         Integer, ForeignKey("workouts.id", ondelete="CASCADE"), nullable=False
     )
+    user_id = Column(Integer, nullable=False)
 
 
 class Program(Base):
@@ -90,6 +91,7 @@ class ProgramDay(Base):
         Integer, ForeignKey("programs.id", ondelete="CASCADE"), nullable=False
     )
     exercises = relationship("ProgramExercise")
+    user_id = Column(Integer, nullable=False)
 
 
 class ProgramExercise(Base):
@@ -107,3 +109,4 @@ class ProgramExercise(Base):
     day_id = Column(
         Integer, ForeignKey("program_days.id", ondelete="CASCADE"), nullable=False
     )
+    user_id = Column(Integer, nullable=False)

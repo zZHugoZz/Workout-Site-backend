@@ -21,12 +21,7 @@ def create_program_day(
     db: Session = Depends(get_db),
 ):
     user_id = decode_token(credentials.credentials)
-    program_query = db.query(models.Program).filter(
-        models.Program.id == program_day.program_id
-    )
-    if program_query.first().user_id != user_id:
-        raise FORBIDDEN_EXCEPTION
-    created_program_day = models.ProgramDay(**program_day.model_dump())
+    created_program_day = models.ProgramDay(**program_day.model_dump(), user_id=user_id)
     db.add(created_program_day)
     db.commit()
     db.refresh(created_program_day)
@@ -48,10 +43,7 @@ def delete_program_day(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Program day with id: {program_day_id} doesn't exist",
         )
-    program_query = db.query(models.Program).filter(
-        models.Program.id == program_day_query.first().program_id
-    )
-    if program_query.first().user_id != user_id:
+    if program_day_query.first().user_id != user_id:
         raise FORBIDDEN_EXCEPTION
     program_day_query.delete()
     db.commit()
