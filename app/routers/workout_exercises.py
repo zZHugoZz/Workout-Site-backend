@@ -1,4 +1,4 @@
-from fastapi import Depends, status, APIRouter, HTTPException, Response, Security
+from fastapi import Depends, status, APIRouter, Response, Security
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from .. import models
@@ -6,7 +6,7 @@ from ..database import get_db
 from .. import schemas
 from .authentication import security
 from ..oauth2 import decode_token
-from ..utils import FORBIDDEN_EXCEPTION
+from ..utils import FORBIDDEN_EXCEPTION, NOT_FOUND_EXCEPTION
 
 
 router = APIRouter(prefix="/workout_exercises", tags=["Workout Exercises"])
@@ -28,7 +28,7 @@ def create_workout_exercise(
     return created_exercise
 
 
-@router.delete("/{workout_id}", status_code=status.HTTP_200_OK)
+@router.delete("/{workout_exercise_id}", status_code=status.HTTP_200_OK)
 def delete_workout_exercise(
     workout_exercise_id: int,
     credentials: HTTPAuthorizationCredentials = Security(security),
@@ -39,11 +39,8 @@ def delete_workout_exercise(
         models.WorkoutExercise.id == workout_exercise_id
     )
     if workout_exercise_query.first() is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Exercise with id: {workout_exercise_id} doesn't exist",
-        )
+        raise NOT_FOUND_EXCEPTION("workout exercise", workout_exercise_id)
     if workout_exercise_query.first().user_id != user_id:
-        return FORBIDDEN_EXCEPTION
+        raise FORBIDDEN_EXCEPTION
     workout_exercise_query.delete()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

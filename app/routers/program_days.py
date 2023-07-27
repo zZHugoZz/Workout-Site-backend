@@ -6,7 +6,7 @@ from app.oauth2 import decode_token
 from .. import schemas
 from .authentication import security
 from .. import models
-from ..utils import FORBIDDEN_EXCEPTION
+from ..utils import FORBIDDEN_EXCEPTION, NOT_FOUND_EXCEPTION
 
 
 router = APIRouter(prefix="/program_days", tags=["Program days"])
@@ -39,10 +39,7 @@ def delete_program_day(
         models.ProgramDay.id == program_day_id
     )
     if program_day_query.first() is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Program day with id: {program_day_id} doesn't exist",
-        )
+        raise NOT_FOUND_EXCEPTION("program day", program_day_id)
     if program_day_query.first().user_id != user_id:
         raise FORBIDDEN_EXCEPTION
     program_day_query.delete()

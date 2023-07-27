@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status, Security
+from fastapi import APIRouter, Depends, Response, status, Security
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import HttpUrl
 from sqlalchemy.orm import Session
@@ -7,7 +7,7 @@ from app.oauth2 import decode_token
 from .. import schemas
 from .. import models
 from .authentication import security
-from ..utils import FORBIDDEN_EXCEPTION
+from ..utils import FORBIDDEN_EXCEPTION, NOT_FOUND_EXCEPTION
 
 
 router = APIRouter(prefix="/programs", tags=["Programs"])
@@ -34,10 +34,7 @@ def get_program(
     user_id = decode_token(credentials.credentials)
     workout_query = db.query(models.Program).filter(models.Program.id == program_id)
     if workout_query.first() is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Program with id: {program_id} doesn't exist",
-        )
+        raise NOT_FOUND_EXCEPTION("program", program_id)
     if workout_query.first().user_id != user_id:
         raise FORBIDDEN_EXCEPTION
     return workout_query.first()
@@ -66,10 +63,7 @@ def delete_workout(
     user_id = decode_token(credentials.credentials)
     program_query = db.query(models.Program).filter(models.Program.id == program_id)
     if program_query.first() is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Program with id: {program_id} doesn't exist",
-        )
+        raise NOT_FOUND_EXCEPTION("program", program_id)
     if program_query.first().user_id != user_id:
         raise FORBIDDEN_EXCEPTION
     program_query.delete()

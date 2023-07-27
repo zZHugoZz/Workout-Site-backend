@@ -1,4 +1,4 @@
-from fastapi import Depends, status, APIRouter, HTTPException, Response, Security
+from fastapi import Depends, status, APIRouter, Response, Security
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from .. import models
@@ -6,7 +6,7 @@ from ..database import get_db
 from .. import schemas
 from .authentication import security
 from ..oauth2 import decode_token
-from ..utils import FORBIDDEN_EXCEPTION
+from ..utils import FORBIDDEN_EXCEPTION, NOT_FOUND_EXCEPTION
 
 
 router = APIRouter(prefix="/workouts", tags=["Workouts"])
@@ -33,10 +33,7 @@ def get_workout(
     user_id = decode_token(credentials.credentials)
     workout_query = db.query(models.Workout).filter(models.Workout.id == workout_id)
     if workout_query.first() is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Workout with id: {workout_id} doesn't exist",
-        )
+        raise NOT_FOUND_EXCEPTION("workout", workout_id)
     if workout_query.first().user_id != user_id:
         raise FORBIDDEN_EXCEPTION
     return workout_query.first()
@@ -64,10 +61,7 @@ def delete_workout(
     user_id = decode_token(credentials.credentials)
     workout_query = db.query(models.Workout).filter(models.Workout.id == workout_id)
     if workout_query.first() is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Workout with id: {workout_id} doesn't exist",
-        )
+        raise NOT_FOUND_EXCEPTION("workout", workout_id)
     if workout_query.first().user_id != user_id:
         raise FORBIDDEN_EXCEPTION
     workout_query.delete()
