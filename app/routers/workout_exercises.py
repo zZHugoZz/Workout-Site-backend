@@ -19,10 +19,17 @@ def create_workout_exercise(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    token = credentials.credentials
-    if decode_token(token):
-        created_exercise = models.WorkoutExercise(**exercise.model_dump())
-        db.add(created_exercise)
-        db.commit()
-        db.refresh(created_exercise)
-        return created_exercise
+    user_id = decode_token(credentials.credentials)
+    workout_id = db.query(models.Workout).filter(
+        models.Workout.id == exercise.workout_id
+    )
+    if workout_id.first().user_id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authorized to perform this action",
+        )
+    created_exercise = models.WorkoutExercise(**exercise.model_dump())
+    db.add(created_exercise)
+    db.commit()
+    db.refresh(created_exercise)
+    return created_exercise

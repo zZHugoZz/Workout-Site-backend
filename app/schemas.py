@@ -68,13 +68,18 @@ class Workout(BaseModel):
 
 
 class ProgramExercise(BaseModel):
-    id: int | None = None
+    id: int
     name: str
     min_sets: int
     max_sets: int
     min_reps: int
     max_reps: int
     day_id: int
+
+
+class ProgramDayIn(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    program_id: int
 
 
 class ProgramDay(BaseModel):
