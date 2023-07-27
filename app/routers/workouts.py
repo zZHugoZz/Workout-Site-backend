@@ -22,18 +22,16 @@ def get_workouts(
     return workouts
 
 
-@router.get(
-    "/{workout_id}", status_code=status.HTTP_200_OK, response_model=schemas.Workout
-)
+@router.get("/{id}", status_code=status.HTTP_200_OK, response_model=schemas.Workout)
 def get_workout(
-    workout_id: int,
+    id: int,
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
     user_id = decode_token(credentials.credentials)
-    workout_query = db.query(models.Workout).filter(models.Workout.id == workout_id)
+    workout_query = db.query(models.Workout).filter(models.Workout.id == id)
     if workout_query.first() is None:
-        raise NOT_FOUND_EXCEPTION("workout", workout_id)
+        raise NOT_FOUND_EXCEPTION("workout", id)
     if workout_query.first().user_id != user_id:
         raise FORBIDDEN_EXCEPTION
     return workout_query.first()
@@ -52,16 +50,16 @@ def create_workout(
     return created_workout
 
 
-@router.delete("/{workout_id}", status_code=status.HTTP_200_OK)
+@router.delete("/{id}", status_code=status.HTTP_200_OK)
 def delete_workout(
-    workout_id: int,
+    id: int,
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
     user_id = decode_token(credentials.credentials)
-    workout_query = db.query(models.Workout).filter(models.Workout.id == workout_id)
+    workout_query = db.query(models.Workout).filter(models.Workout.id == id)
     if workout_query.first() is None:
-        raise NOT_FOUND_EXCEPTION("workout", workout_id)
+        raise NOT_FOUND_EXCEPTION("workout", id)
     if workout_query.first().user_id != user_id:
         raise FORBIDDEN_EXCEPTION
     workout_query.delete()

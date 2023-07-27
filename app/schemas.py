@@ -59,7 +59,6 @@ class WorkoutExerciseIn(BaseModel):
 
 
 class Workout(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
     id: int
     created_at: datetime
     user_id: int
@@ -77,9 +76,14 @@ class ProgramExercise(BaseModel):
     day_id: int
 
 
-class ProgramDayIn(BaseModel):
+class ProgramExerciseIn(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    program_id: int
+    name: str
+    min_sets: int
+    max_sets: int
+    min_reps: int
+    max_reps: int
+    day_id: int
 
 
 class ProgramDay(BaseModel):
@@ -88,9 +92,9 @@ class ProgramDay(BaseModel):
     exercises: list[ProgramExercise]
 
 
-class ProgramIn(BaseModel):
+class ProgramDayIn(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    name: str
+    program_id: int
 
 
 class Program(BaseModel):
@@ -99,3 +103,8 @@ class Program(BaseModel):
     user_id: int
     days: list[ProgramDay]
     created_at: datetime
+
+
+class ProgramIn(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    name: str

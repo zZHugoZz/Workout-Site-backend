@@ -28,18 +28,18 @@ def create_workout_exercise(
     return created_exercise
 
 
-@router.delete("/{workout_exercise_id}", status_code=status.HTTP_200_OK)
+@router.delete("/{id}", status_code=status.HTTP_200_OK)
 def delete_workout_exercise(
-    workout_exercise_id: int,
+    id: int,
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
     user_id = decode_token(credentials.credentials)
     workout_exercise_query = db.query(models.WorkoutExercise).filter(
-        models.WorkoutExercise.id == workout_exercise_id
+        models.WorkoutExercise.id == id
     )
     if workout_exercise_query.first() is None:
-        raise NOT_FOUND_EXCEPTION("workout exercise", workout_exercise_id)
+        raise NOT_FOUND_EXCEPTION("workout exercise", id)
     if workout_exercise_query.first().user_id != user_id:
         raise FORBIDDEN_EXCEPTION
     workout_exercise_query.delete()

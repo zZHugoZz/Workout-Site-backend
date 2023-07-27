@@ -23,18 +23,16 @@ def get_programs(
     return programs
 
 
-@router.get(
-    "/{program_id}", status_code=status.HTTP_200_OK, response_model=schemas.Program
-)
+@router.get("/{id}", status_code=status.HTTP_200_OK, response_model=schemas.Program)
 def get_program(
-    program_id: int,
+    id: int,
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
     user_id = decode_token(credentials.credentials)
-    workout_query = db.query(models.Program).filter(models.Program.id == program_id)
+    workout_query = db.query(models.Program).filter(models.Program.id == id)
     if workout_query.first() is None:
-        raise NOT_FOUND_EXCEPTION("program", program_id)
+        raise NOT_FOUND_EXCEPTION("program", id)
     if workout_query.first().user_id != user_id:
         raise FORBIDDEN_EXCEPTION
     return workout_query.first()
@@ -54,16 +52,16 @@ def create_program(
     return created_program
 
 
-@router.delete("/{program_id}", status_code=status.HTTP_200_OK)
+@router.delete("/{id}", status_code=status.HTTP_200_OK)
 def delete_workout(
-    program_id: int,
+    id: int,
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
     user_id = decode_token(credentials.credentials)
-    program_query = db.query(models.Program).filter(models.Program.id == program_id)
+    program_query = db.query(models.Program).filter(models.Program.id == id)
     if program_query.first() is None:
-        raise NOT_FOUND_EXCEPTION("program", program_id)
+        raise NOT_FOUND_EXCEPTION("program", id)
     if program_query.first().user_id != user_id:
         raise FORBIDDEN_EXCEPTION
     program_query.delete()

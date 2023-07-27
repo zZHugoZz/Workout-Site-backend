@@ -28,18 +28,16 @@ def create_program_day(
     return created_program_day
 
 
-@router.delete("/{program_day_id}", status_code=status.HTTP_200_OK)
+@router.delete("/{id}", status_code=status.HTTP_200_OK)
 def delete_program_day(
-    program_day_id: int,
+    id: int,
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
     user_id = decode_token(credentials.credentials)
-    program_day_query = db.query(models.ProgramDay).filter(
-        models.ProgramDay.id == program_day_id
-    )
+    program_day_query = db.query(models.ProgramDay).filter(models.ProgramDay.id == id)
     if program_day_query.first() is None:
-        raise NOT_FOUND_EXCEPTION("program day", program_day_id)
+        raise NOT_FOUND_EXCEPTION("program day", id)
     if program_day_query.first().user_id != user_id:
         raise FORBIDDEN_EXCEPTION
     program_day_query.delete()
