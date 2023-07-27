@@ -6,6 +6,7 @@ from ..database import get_db
 from .. import schemas
 from .authentication import security
 from ..oauth2 import decode_token
+from ..utils import FORBIDDEN_EXCEPTION
 
 
 router = APIRouter(prefix="/workouts", tags=["Workouts"])
@@ -37,10 +38,7 @@ def get_workout(
             detail=f"Workout with id: {workout_id} doesn't exist",
         )
     if workout_query.first().user_id != user_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unhauthorized to perform this action",
-        )
+        raise FORBIDDEN_EXCEPTION
     return workout_query.first()
 
 
@@ -71,10 +69,7 @@ def delete_workout(
             detail=f"Workout with id: {workout_id} doesn't exist",
         )
     if workout_query.first().user_id != user_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unhauthorized to perform this action",
-        )
+        raise FORBIDDEN_EXCEPTION
     workout_query.delete()
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

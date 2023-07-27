@@ -6,6 +6,7 @@ from ..database import get_db
 from .. import schemas
 from .authentication import security
 from ..oauth2 import decode_token
+from ..utils import FORBIDDEN_EXCEPTION
 
 
 router = APIRouter(prefix="/workout_exercises", tags=["Workout Exercises"])
@@ -24,10 +25,7 @@ def create_workout_exercise(
         models.Workout.id == exercise.workout_id
     )
     if workout_id.first().user_id != user_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authorized to perform this action",
-        )
+        raise FORBIDDEN_EXCEPTION
     created_exercise = models.WorkoutExercise(**exercise.model_dump())
     db.add(created_exercise)
     db.commit()

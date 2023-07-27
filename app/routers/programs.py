@@ -7,6 +7,7 @@ from app.oauth2 import decode_token
 from .. import schemas
 from .. import models
 from .authentication import security
+from ..utils import FORBIDDEN_EXCEPTION
 
 
 router = APIRouter(prefix="/programs", tags=["Programs"])
@@ -38,10 +39,7 @@ def get_program(
             detail=f"Program with id: {program_id} doesn't exist",
         )
     if workout_query.first().user_id != user_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authorized to perform this action",
-        )
+        raise FORBIDDEN_EXCEPTION
     return workout_query.first()
 
 
@@ -73,10 +71,7 @@ def delete_workout(
             detail=f"Program with id: {program_id} doesn't exist",
         )
     if program_query.first().user_id != user_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authorized to perform this action",
-        )
+        raise FORBIDDEN_EXCEPTION
     program_query.delete()
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
