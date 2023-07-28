@@ -103,8 +103,3 @@ class Program(BaseModel):
     user_id: int
     days: list[ProgramDay]
     created_at: datetime
-
-
-class ProgramIn(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    name: str
