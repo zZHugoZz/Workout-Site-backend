@@ -7,6 +7,7 @@ from .. import schemas
 from .authentication import security
 from ..oauth2 import decode_token
 from ..utils import FORBIDDEN_EXCEPTION, NOT_FOUND_EXCEPTION
+from datetime import date
 
 
 router = APIRouter(prefix="/workouts", tags=["Workouts"])
@@ -43,7 +44,8 @@ def create_workout(
     db: Session = Depends(get_db),
 ):
     user_id = decode_token(credentials.credentials)
-    created_workout = models.Workout(user_id=user_id)
+    current_date = date.today()
+    created_workout = models.Workout(user_id=user_id, date=str(current_date))
     db.add(created_workout)
     db.commit()
     db.refresh(created_workout)
