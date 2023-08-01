@@ -34,28 +34,10 @@ def get_progression(
     pass
 
 
-# @router.post("/", status_code=status.HTTP_201_CREATED, response_model=Progression)
-# def create_progression(
-#     progression: ProgresionIn,
-#     credentials: HTTPAuthorizationCredentials = Security(security),
-#     db: Session = Depends(get_db),
-# ):
-#     user_id = decode_token(credentials.credentials)
-#     created_progression = models.Progression(
-#         **progression.model_dump(), user_id=user_id
-#     )
-#     db.add(created_progression)
-#     db.commit()
-#     db.refresh(created_progression)
-#     return created_progression
-
-
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=Progression)
 def create_progression(
     progression: ProgresionIn,
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    return create(
-        data=progression, credentials=credentials, db=db, model=models.Progression
-    )
+    return create(credentials, db, models.Progression, progression)

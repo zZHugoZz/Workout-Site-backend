@@ -31,9 +31,13 @@ def NOT_FOUND_EXCEPTION(name: str, id: int):
     )
 
 
-def create(data, credentials: HTTPAuthorizationCredentials, db: Session, model):
+def create(credentials: HTTPAuthorizationCredentials, db: Session, model, data=None):
     user_id = decode_token(credentials.credentials)
-    created_object = model(**data.model_dump(), user_id=user_id)
+    created_object = (
+        model(**data.model_dump(), user_id=user_id)
+        if data is not None
+        else model(user_id=user_id)
+    )
     db.add(created_object)
     db.commit()
     db.refresh(created_object)
