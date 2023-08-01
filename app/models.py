@@ -148,3 +148,13 @@ class Performance(Base):
         Integer, ForeignKey("progressions.id", ondelete="CASCADE"), nullable=False
     )
     user_id = Column(Integer, nullable=False)
+
+
+class Unit(Base):
+    __tablename__ = "units"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    user = relationship("User")
