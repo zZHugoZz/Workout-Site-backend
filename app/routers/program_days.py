@@ -28,13 +28,4 @@ def delete_program_day(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    # user_id = decode_token(credentials.credentials)
-    # program_day_query = db.query(models.ProgramDay).filter(models.ProgramDay.id == id)
-    # if program_day_query.first() is None:
-    #     raise NOT_FOUND_EXCEPTION("program day", id)
-    # if program_day_query.first().user_id != user_id:
-    #     raise FORBIDDEN_EXCEPTION
-    # program_day_query.delete()
-    # db.commit()
-    # return Response(status_code=status.HTTP_204_NO_CONTENT)
     return delete(id, credentials, db, models.ProgramDay, "Program day")

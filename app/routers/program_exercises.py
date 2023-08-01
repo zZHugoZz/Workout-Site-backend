@@ -28,13 +28,4 @@ def delete_program_exercise(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    # user_id = decode_token(credentials.credentials)
-    # program_exercise_query = db.query(ProgramExercise).filter(ProgramExercise.id == id)
-    # if program_exercise_query.first() is None:
-    #     raise NOT_FOUND_EXCEPTION("program exercise", id)
-    # if program_exercise_query.first().user_id != user_id:
-    #     raise FORBIDDEN_EXCEPTION
-    # program_exercise_query.delete()
-    # db.commit()
-    # return Response(status_code=status.HTTP_204_NO_CONTENT)
     return delete(id, credentials, db, models.ProgramExercise, "Program exercise")

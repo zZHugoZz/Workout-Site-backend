@@ -29,14 +29,4 @@ def delete_workout_exercise(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    # user_id = decode_token(credentials.credentials)
-    # workout_exercise_query = db.query(models.WorkoutExercise).filter(
-    #     models.WorkoutExercise.id == id
-    # )
-    # if workout_exercise_query.first() is None:
-    #     raise NOT_FOUND_EXCEPTION("workout exercise", id)
-    # if workout_exercise_query.first().user_id != user_id:
-    #     raise FORBIDDEN_EXCEPTION
-    # workout_exercise_query.delete()
-    # return Response(status_code=status.HTTP_204_NO_CONTENT)
     return delete(id, credentials, db, models.WorkoutExercise, "Workout exercise")
