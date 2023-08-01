@@ -1,7 +1,9 @@
 from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
+from app.models import User
 
 
+# -------------------- users --------------------
 class BaseUser(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     username: str
@@ -17,6 +19,7 @@ class UserOut(BaseUser):
     created_at: datetime
 
 
+# -------------------- tokens --------------------
 class Token(BaseModel):
     access_token: str
     refresh_token: str
@@ -31,6 +34,7 @@ class RefreshToken(BaseModel):
     refresh_token: str
 
 
+# -------------------- explore exercises --------------------
 class Exercise(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
@@ -38,6 +42,7 @@ class Exercise(BaseModel):
     link: str
 
 
+# -------------------- workouts --------------------
 class WorkoutExercise(BaseModel):
     id: int
     name: str
@@ -67,6 +72,7 @@ class Workout(BaseModel):
     exercises: list[WorkoutExercise]
 
 
+# -------------------- programs --------------------
 class ProgramExercise(BaseModel):
     id: int
     name: str
@@ -104,3 +110,28 @@ class Program(BaseModel):
     user_id: int
     days: list[ProgramDay]
     created_at: datetime
+
+
+# -------------------- progressions --------------------
+class PerformanceIn(BaseModel):
+    date: str
+    weight: float
+    progression_id: int
+
+
+class Performance(PerformanceIn):
+    id: int
+    created_at: datetime
+    user_id: int
+
+
+class ProgresionIn(BaseModel):
+    name: str
+    color: str
+
+
+class Progression(ProgresionIn):
+    id: int
+    created_at: datetime
+    user_id: int
+    performances: list[Performance]
