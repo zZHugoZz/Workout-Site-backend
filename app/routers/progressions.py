@@ -6,8 +6,7 @@ from app.oauth2 import decode_token
 from ..schemas import ProgresionIn, Progression
 from .. import models
 from .authentication import security
-
-from ..utils import create
+from ..utils import create, delete
 
 
 router = APIRouter(prefix="/progressions", tags=["Progressions"])
@@ -41,3 +40,12 @@ def create_progression(
     db: Session = Depends(get_db),
 ):
     return create(credentials, db, models.Progression, progression)
+
+
+@router.delete("/{id}", status_code=status.HTTP_200_OK)
+def delete_progression(
+    id: int,
+    credentials: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(get_db),
+):
+    return delete(id, credentials, db, models.Progression, "Progression")

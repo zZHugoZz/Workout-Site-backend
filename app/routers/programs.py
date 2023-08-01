@@ -7,7 +7,7 @@ from app.oauth2 import decode_token
 from .. import schemas
 from .. import models
 from .authentication import security
-from ..utils import FORBIDDEN_EXCEPTION, NOT_FOUND_EXCEPTION, create
+from ..utils import FORBIDDEN_EXCEPTION, NOT_FOUND_EXCEPTION, create, delete
 
 
 router = APIRouter(prefix="/programs", tags=["Programs"])
@@ -52,12 +52,13 @@ def delete_program(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    user_id = decode_token(credentials.credentials)
-    program_query = db.query(models.Program).filter(models.Program.id == id)
-    if program_query.first() is None:
-        raise NOT_FOUND_EXCEPTION("program", id)
-    if program_query.first().user_id != user_id:
-        raise FORBIDDEN_EXCEPTION
-    program_query.delete()
-    db.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    # user_id = decode_token(credentials.credentials)
+    # program_query = db.query(models.Program).filter(models.Program.id == id)
+    # if program_query.first() is None:
+    #     raise NOT_FOUND_EXCEPTION("program", id)
+    # if program_query.first().user_id != user_id:
+    #     raise FORBIDDEN_EXCEPTION
+    # program_query.delete()
+    # db.commit()
+    # return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return delete(id, credentials, db, models.Program, "Program")
