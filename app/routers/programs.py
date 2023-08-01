@@ -47,7 +47,7 @@ def create_program(
 
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
-def delete_workout(
+def delete_program(
     id: int,
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),

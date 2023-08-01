@@ -8,7 +8,7 @@ from .authentication import security
 from ..oauth2 import decode_token
 from ..utils import FORBIDDEN_EXCEPTION, NOT_FOUND_EXCEPTION
 from datetime import date
-from ..utils import create
+from ..utils import create, delete, get_items, get_item
 
 
 router = APIRouter(prefix="/workouts", tags=["Workouts"])
@@ -19,9 +19,10 @@ def get_workouts(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    user_id = decode_token(credentials.credentials)
-    workouts = db.query(models.Workout).filter(models.Workout.user_id == user_id).all()
-    return workouts
+    # user_id = decode_token(credentials.credentials)
+    # workouts = db.query(models.Workout).filter(models.Workout.user_id == user_id).all()
+    # return workouts
+    return get_items(credentials, db, models.Workout)
 
 
 @router.get("/{id}", status_code=status.HTTP_200_OK, response_model=schemas.Workout)
@@ -44,7 +45,8 @@ def create_workout(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    return create(credentials, db, models.Workout)
+    current_date = {"date": date.today()}
+    return create(credentials, db, models.Workout, additional_data=current_date)
 
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
@@ -53,12 +55,4 @@ def delete_workout(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    user_id = decode_token(credentials.credentials)
-    workout_query = db.query(models.Workout).filter(models.Workout.id == id)
-    if workout_query.first() is None:
-        raise NOT_FOUND_EXCEPTION("workout", id)
-    if workout_query.first().user_id != user_id:
-        raise FORBIDDEN_EXCEPTION
-    workout_query.delete()
-    db.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return delete(id, credentials, db, models.Workout, "Workout")

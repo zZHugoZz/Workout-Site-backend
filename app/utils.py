@@ -1,4 +1,4 @@
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Response, status
 from fastapi.security import HTTPAuthorizationCredentials
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
@@ -29,14 +29,60 @@ def NOT_FOUND_EXCEPTION(name: str, id: int):
     )
 
 
-def create(credentials: HTTPAuthorizationCredentials, db: Session, model, data=None):
+def get_items(credentials: HTTPAuthorizationCredentials, db: Session, model):
     user_id = decode_token(credentials.credentials)
-    created_object = (
-        model(**data.model_dump(), user_id=user_id)
+    items = db.query(model).filter(model.user_id == user_id).all()
+    return items
+
+
+def get_item(
+    id: int,
+    credentials: HTTPAuthorizationCredentials,
+    db: Session,
+    model,
+    model_name: str,
+):
+    user_id = decode_token(credentials.credentials)
+    query = db.query(model).filter(model.id == id)
+    if query.first() is None:
+        raise NOT_FOUND_EXCEPTION(model_name, id)
+    if query.first().user_id != user_id:
+        raise FORBIDDEN_EXCEPTION
+    return query.first()
+
+
+def create(
+    credentials: HTTPAuthorizationCredentials,
+    db: Session,
+    model,
+    data=None,
+    additional_data: dict = {},
+):
+    user_id = decode_token(credentials.credentials)
+    created_item = (
+        model(**data.model_dump(), **additional_data, user_id=user_id)
         if data is not None
-        else model(user_id=user_id)
+        else model(**additional_data, user_id=user_id)
     )
-    db.add(created_object)
+    db.add(created_item)
     db.commit()
-    db.refresh(created_object)
-    return created_object
+    db.refresh(created_item)
+    return created_item
+
+
+def delete(
+    id: int,
+    credentials: HTTPAuthorizationCredentials,
+    db: Session,
+    model,
+    model_name: str,
+):
+    user_id = decode_token(credentials.credentials)
+    query = db.query(model).filter(model.id == id)
+    if query.first() is None:
+        raise NOT_FOUND_EXCEPTION(model_name, id)
+    if query.first().user_id != user_id:
+        raise FORBIDDEN_EXCEPTION
+    query.delete()
+    db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
