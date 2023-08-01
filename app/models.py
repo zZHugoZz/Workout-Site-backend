@@ -154,6 +154,7 @@ class Unit(Base):
     __tablename__ = "units"
 
     id = Column(Integer, primary_key=True, nullable=False)
+    unit = Column(String(100), nullable=False, server_default="Kg")
     user_id = Column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
