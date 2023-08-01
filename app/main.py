@@ -14,6 +14,7 @@ from .routers import (
     program_exercises,
     progressions,
     performances,
+    units,
 )
 
 
@@ -40,4 +41,5 @@ app.include_router(program_days.router)
 app.include_router(program_exercises.router)
 app.include_router(progressions.router)
 app.include_router(performances.router)
+app.include_router(units.router)
 app.include_router(websockets.router)

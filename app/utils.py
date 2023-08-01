@@ -102,6 +102,6 @@ def update(
         raise NOT_FOUND_EXCEPTION(model_name, id)
     if query.first().user_id != user_id:
         raise FORBIDDEN_EXCEPTION
-    query.update(**updated_item.model_dump())
+    query.update(updated_item.model_dump())
     db.commit()
     return query.first()
