@@ -122,3 +122,12 @@ class Progression(ProgresionIn):
     created_at: datetime
     user_id: int
     performances: list[Performance]
+
+
+class UnitIn(BaseModel):
+    unit: str
+
+
+class Unit(UnitIn):
+    id: int
+    user_id: int
