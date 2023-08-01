@@ -3,6 +3,7 @@ from sqlalchemy import Column, Float, ForeignKey, Integer, String, TIMESTAMP, te
 from sqlalchemy.orm import relationship
 
 
+# -------------------- users --------------------
 class User(Base):
     __tablename__ = "users"
 
@@ -15,6 +16,7 @@ class User(Base):
     )
 
 
+# -------------------- blacklisted tokens --------------------
 class BlackListedToken(Base):
     __tablename__ = "blacklisted_tokens"
 
@@ -25,6 +27,7 @@ class BlackListedToken(Base):
     )
 
 
+# -------------------- explore exercises --------------------
 class Exercise(Base):
     __tablename__ = "exercises"
 
@@ -33,6 +36,7 @@ class Exercise(Base):
     link = Column(String(50), nullable=False)
 
 
+# -------------------- workouts --------------------
 class Workout(Base):
     __tablename__ = "workouts"
 
@@ -66,6 +70,7 @@ class WorkoutExercise(Base):
     user_id = Column(Integer, nullable=False)
 
 
+# -------------------- programs --------------------
 class Program(Base):
     __tablename__ = "programs"
 
@@ -109,5 +114,37 @@ class ProgramExercise(Base):
     )
     day_id = Column(
         Integer, ForeignKey("program_days.id", ondelete="CASCADE"), nullable=False
+    )
+    user_id = Column(Integer, nullable=False)
+
+
+# -------------------- progressions --------------------
+class Progression(Base):
+    __tablename__ = "progressions"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    name = Column(String(100), nullable=False)
+    color = Column(String(100), nullable=False, server_default="#FF7543")
+    created_at = Column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
+    )
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    user = relationship("User")
+    performances = relationship("Performance")
+
+
+class Performance(Base):
+    __tablename__ = "performances"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    date = Column(String(100), nullable=False, server_default="today")
+    weight = Column(Float(precision=1), nullable=False)
+    created_at = Column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
+    )
+    progression_id = Column(
+        Integer, ForeignKey("progressions.id", ondelete="CASCADE"), nullable=False
     )
     user_id = Column(Integer, nullable=False)
