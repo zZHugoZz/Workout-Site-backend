@@ -86,3 +86,22 @@ def delete(
     query.delete()
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+def update(
+    id: int,
+    updated_item,
+    credentials: HTTPAuthorizationCredentials,
+    db: Session,
+    model,
+    model_name: str,
+):
+    user_id = decode_token(credentials.credentials)
+    query = db.query(model).filter(model.id == id)
+    if query.first() is None:
+        raise NOT_FOUND_EXCEPTION(model_name, id)
+    if query.first().user_id != user_id:
+        raise FORBIDDEN_EXCEPTION
+    query.update(**updated_item.model_dump())
+    db.commit()
+    return query.first()
