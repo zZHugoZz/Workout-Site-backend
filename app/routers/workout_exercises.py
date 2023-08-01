@@ -1,12 +1,11 @@
-from fastapi import Depends, status, APIRouter, Response, Security
+from fastapi import Depends, status, APIRouter, Security
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from .. import models
 from ..database import get_db
 from .. import schemas
 from .authentication import security
-from ..oauth2 import decode_token
-from ..utils import FORBIDDEN_EXCEPTION, NOT_FOUND_EXCEPTION, create, delete
+from ..utils import create, delete
 
 
 router = APIRouter(prefix="/workout_exercises", tags=["Workout Exercises"])

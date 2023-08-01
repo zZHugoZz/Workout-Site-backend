@@ -2,11 +2,10 @@ from fastapi import APIRouter, Depends, Security, status, security
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.oauth2 import decode_token
 from ..schemas import ProgresionIn, Progression
 from .. import models
 from .authentication import security
-from ..utils import create, delete
+from ..utils import create, delete, get_items, get_item
 
 
 router = APIRouter(prefix="/progressions", tags=["Progressions"])
@@ -17,11 +16,7 @@ def get_progressions(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    user_id = decode_token(credentials.credentials)
-    progressions = (
-        db.query(models.Progression).filter(models.Progression.user_id == user_id).all()
-    )
-    return progressions
+    return get_items(credentials, db, models.Progression)
 
 
 @router.get("/{id}", status_code=status.HTTP_200_OK, response_model=Progression)
@@ -30,7 +25,7 @@ def get_progression(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    pass
+    return get_item(id, credentials, db, models.Progression, "Progression")
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=Progression)
