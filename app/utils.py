@@ -1,9 +1,7 @@
 from fastapi import HTTPException, status
-from passlib.context import CryptContext
-
 from fastapi.security import HTTPAuthorizationCredentials
+from passlib.context import CryptContext
 from sqlalchemy.orm import Session
-
 from app.oauth2 import decode_token
 
 

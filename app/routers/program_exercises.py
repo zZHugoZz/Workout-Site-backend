@@ -7,6 +7,7 @@ from app.utils import FORBIDDEN_EXCEPTION, NOT_FOUND_EXCEPTION
 from .. import schemas
 from .authentication import security
 from ..models import ProgramExercise
+from ..utils import FORBIDDEN_EXCEPTION, NOT_FOUND_EXCEPTION, create
 
 
 router = APIRouter(prefix="/program_exercises", tags=["Program Exercises"])
@@ -20,14 +21,7 @@ def create_program_exercise(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    user_id = decode_token(credentials.credentials)
-    created_program_exercise = ProgramExercise(
-        **program_exercise.model_dump(), user_id=user_id
-    )
-    db.add(created_program_exercise)
-    db.commit()
-    db.refresh(created_program_exercise)
-    return created_program_exercise
+    return create(credentials, db, ProgramExercise, program_exercise)
 
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)

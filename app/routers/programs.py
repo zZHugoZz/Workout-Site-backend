@@ -7,7 +7,7 @@ from app.oauth2 import decode_token
 from .. import schemas
 from .. import models
 from .authentication import security
-from ..utils import FORBIDDEN_EXCEPTION, NOT_FOUND_EXCEPTION
+from ..utils import FORBIDDEN_EXCEPTION, NOT_FOUND_EXCEPTION, create
 
 
 router = APIRouter(prefix="/programs", tags=["Programs"])
@@ -43,12 +43,7 @@ def create_program(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    user_id = decode_token(credentials.credentials)
-    created_program = models.Program(user_id=user_id)
-    db.add(created_program)
-    db.commit()
-    db.refresh(created_program)
-    return created_program
+    return create(credentials, db, models.Program)
 
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)

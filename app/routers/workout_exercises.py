@@ -6,7 +6,7 @@ from ..database import get_db
 from .. import schemas
 from .authentication import security
 from ..oauth2 import decode_token
-from ..utils import FORBIDDEN_EXCEPTION, NOT_FOUND_EXCEPTION
+from ..utils import FORBIDDEN_EXCEPTION, NOT_FOUND_EXCEPTION, create
 
 
 router = APIRouter(prefix="/workout_exercises", tags=["Workout Exercises"])
@@ -20,12 +20,7 @@ def create_workout_exercise(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    user_id = decode_token(credentials.credentials)
-    created_exercise = models.WorkoutExercise(**exercise.model_dump(), user_id=user_id)
-    db.add(created_exercise)
-    db.commit()
-    db.refresh(created_exercise)
-    return created_exercise
+    return create(credentials, db, models.WorkoutExercise, exercise)
 
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
