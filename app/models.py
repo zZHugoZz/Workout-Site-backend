@@ -1,5 +1,6 @@
 from .database import Base
-from sqlalchemy import Column, Float, ForeignKey, Integer, String, TIMESTAMP, text, BLOB
+from sqlalchemy import Column, Float, ForeignKey, Integer, String, TIMESTAMP, text
+from sqlalchemy.dialects.postgresql import BYTEA
 from sqlalchemy.orm import relationship
 
 
@@ -24,7 +25,7 @@ class Profile(Base):
     email = Column(String(100), nullable=False, unique=True)
     age = Column(Integer, nullable=True)
     gender = Column(String(100), nullable=True)
-    profile_picture = Column(BLOB, nullable=True)
+    profile_picture = Column(BYTEA, nullable=True)
     created_at = Column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
