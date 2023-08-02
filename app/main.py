@@ -15,6 +15,7 @@ from .routers import (
     progressions,
     performances,
     units,
+    profiles,
 )
 
 
@@ -32,6 +33,7 @@ app.add_middleware(
 )
 
 app.include_router(users.router)
+app.include_router(profiles.router)
 app.include_router(exercises.router)
 app.include_router(authentication.router)
 app.include_router(workouts.router)
