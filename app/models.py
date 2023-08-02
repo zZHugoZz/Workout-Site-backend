@@ -1,5 +1,5 @@
 from .database import Base
-from sqlalchemy import Column, Float, ForeignKey, Integer, String, TIMESTAMP, text
+from sqlalchemy import Column, Float, ForeignKey, Integer, String, TIMESTAMP, text, BLOB
 from sqlalchemy.orm import relationship
 
 
@@ -11,6 +11,20 @@ class User(Base):
     username = Column(String(150), nullable=False)
     email = Column(String(100), nullable=False, unique=True)
     password = Column(String(100), nullable=False)
+    created_at = Column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
+    )
+
+
+class Profile(Base):
+    __tablename__ = "profiles"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    username = Column(String(150), nullable=False)
+    email = Column(String(100), nullable=False, unique=True)
+    age = Column(Integer, nullable=True)
+    gender = Column(String(100), nullable=True)
+    profile_picture = Column(BLOB, nullable=True)
     created_at = Column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )

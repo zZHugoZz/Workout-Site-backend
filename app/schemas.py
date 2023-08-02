@@ -19,6 +19,12 @@ class UserOut(BaseUser):
     created_at: datetime
 
 
+class UserProfile(BaseUser):
+    age: int
+    gender: str | None = None
+    profile_picture: bytes
+
+
 # -------------------- tokens --------------------
 class Token(BaseModel):
     access_token: str
