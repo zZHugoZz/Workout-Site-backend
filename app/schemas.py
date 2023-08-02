@@ -1,6 +1,5 @@
 from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
-from app.models import User
 
 
 # -------------------- users --------------------
@@ -20,9 +19,11 @@ class UserOut(BaseUser):
 
 
 class UserProfile(BaseUser):
-    age: int
+    age: int | None = None
     gender: str | None = None
-    profile_picture: bytes
+    profile_picture: bytes | None = None
+    user_id: int
+    user: UserOut
 
 
 # -------------------- tokens --------------------

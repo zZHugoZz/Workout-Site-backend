@@ -26,9 +26,13 @@ class Profile(Base):
     age = Column(Integer, nullable=True)
     gender = Column(String(100), nullable=True)
     profile_picture = Column(BYTEA, nullable=True)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     created_at = Column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
+    user = relationship("User")
 
 
 # -------------------- blacklisted tokens --------------------

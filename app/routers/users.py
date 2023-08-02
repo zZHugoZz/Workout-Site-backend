@@ -33,4 +33,12 @@ def create_user(user: schemas.UserIn, db: Session = Depends(get_db)):
     db.add(created_user)
     db.commit()
     db.refresh(created_user)
+    created_profile = models.Profile(
+        username=created_user.username,
+        email=created_user.email,
+        user_id=created_user.id,
+    )
+    db.add(created_profile)
+    db.commit()
+    db.refresh(created_profile)
     return created_user
