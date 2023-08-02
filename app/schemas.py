@@ -18,7 +18,7 @@ class UserOut(BaseUser):
     created_at: datetime
 
 
-class UserProfile(BaseUser):
+class Profile(BaseUser):
     age: int | None = None
     gender: str | None = None
     profile_picture: bytes | None = None
