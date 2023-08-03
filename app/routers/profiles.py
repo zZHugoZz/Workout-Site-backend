@@ -3,7 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.oauth2 import decode_token
-from ..schemas import Profile
+from ..schemas import Profile, ProfileIn
 from .authentication import security
 from .. import models
 
@@ -19,3 +19,16 @@ def get_profile(
     user_id = decode_token(credentials.credentials)
     profile = db.query(models.Profile).filter(models.Profile.user_id == user_id).first()
     return profile
+
+
+@router.put("/", status_code=status.HTTP_200_OK, response_model=Profile)
+def update_profile(
+    profile: ProfileIn,
+    credentials: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(get_db),
+):
+    user_id = decode_token(credentials.credentials)
+    query = db.query(models.Profile).filter(models.Profile.user_id == user_id)
+    query.update(profile.model_dump())
+    db.commit()
+    return query.first()
