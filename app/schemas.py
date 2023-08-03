@@ -18,10 +18,13 @@ class UserOut(BaseUser):
     created_at: datetime
 
 
-class Profile(BaseUser):
+class ProfileIn(BaseModel):
     age: int | None = None
     gender: str | None = None
     profile_picture: bytes | None = None
+
+
+class Profile(ProfileIn):
     user_id: int
     user: UserOut
 
