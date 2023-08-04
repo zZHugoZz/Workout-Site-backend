@@ -41,4 +41,8 @@ def create_user(user: schemas.UserIn, db: Session = Depends(get_db)):
     db.add(created_profile)
     db.commit()
     db.refresh(created_profile)
+    created_unit = models.Unit(user_id=created_user.id)
+    db.add(created_unit)
+    db.commit()
+    db.refresh(created_unit)
     return created_user

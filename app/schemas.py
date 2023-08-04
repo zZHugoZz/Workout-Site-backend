@@ -140,4 +140,3 @@ class UnitIn(BaseModel):
 
 class Unit(UnitIn):
     id: int
-    user_id: int
