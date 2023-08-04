@@ -177,3 +177,24 @@ class Unit(Base):
     user_id = Column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
+
+
+# -------------------- weight change --------------------
+class BodyWeight(Base):
+    __tablename__ = "body_weights"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    weight = Column(Float(precision=1), nullable=False)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+
+
+class BodyWeightUnit(Base):
+    __tablename__ = "body_weight_units"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    unit = Column(String(100), nullable=False, server_default="Kg")
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
