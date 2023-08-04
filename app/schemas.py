@@ -146,11 +146,13 @@ class Unit(UnitIn):
 # -------------------- weight changes --------------------
 class BodyWeightIn(BaseModel):
     weight: float
+    date: str
 
 
 class BodyWeight(BodyWeightIn):
     id: int
     user_id: int
+    created_at: datetime
 
 
 class BodyWeightUnitIn(BaseModel):

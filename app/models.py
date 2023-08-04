@@ -2,6 +2,7 @@ from .database import Base
 from sqlalchemy import Column, Float, ForeignKey, Integer, String, TIMESTAMP, text
 from sqlalchemy.dialects.postgresql import BYTEA
 from sqlalchemy.orm import relationship
+from datetime import datetime
 
 
 # -------------------- users --------------------
@@ -184,9 +185,13 @@ class BodyWeight(Base):
     __tablename__ = "body_weights"
 
     id = Column(Integer, primary_key=True, nullable=False)
+    date = Column(String(100), nullable=False, server_default=str(datetime.today()))
     weight = Column(Float(precision=1), nullable=False)
     user_id = Column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    created_at = Column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
 
 
@@ -197,4 +202,7 @@ class BodyWeightUnit(Base):
     unit = Column(String(100), nullable=False, server_default="Kg")
     user_id = Column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    created_at = Column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
