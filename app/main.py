@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from . import models
 from .database import engine
 from .routers import (
     users,
@@ -16,6 +15,7 @@ from .routers import (
     performances,
     units,
     profiles,
+    bodyweights,
 )
 
 
@@ -34,8 +34,10 @@ app.add_middleware(
 
 app.include_router(users.router)
 app.include_router(profiles.router)
-app.include_router(exercises.router)
 app.include_router(authentication.router)
+
+app.include_router(exercises.router)
+
 app.include_router(workouts.router)
 app.include_router(workout_exercises.router)
 app.include_router(programs.router)
@@ -44,4 +46,7 @@ app.include_router(program_exercises.router)
 app.include_router(progressions.router)
 app.include_router(performances.router)
 app.include_router(units.router)
+
+app.include_router(bodyweights.router)
+
 app.include_router(websockets.router)
