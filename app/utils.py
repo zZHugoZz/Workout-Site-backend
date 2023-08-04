@@ -3,6 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from app.oauth2 import decode_token
+from . import schemas
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -105,3 +106,9 @@ def update(
     query.update(updated_item.model_dump())
     db.commit()
     return query.first()
+
+
+def add_to_db(created_item, db: Session):
+    db.add(created_item)
+    db.commit()
+    db.refresh(created_item)

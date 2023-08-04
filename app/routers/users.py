@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from .. import models
 from ..database import get_db
 from .. import schemas
-from ..utils import hash
+from ..utils import hash, add_to_db
 
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -30,19 +30,13 @@ def get_user(id: int, db: Session = Depends(get_db)):
 def create_user(user: schemas.UserIn, db: Session = Depends(get_db)):
     user.password = hash(user.password)
     created_user = models.User(**user.model_dump())
-    db.add(created_user)
-    db.commit()
-    db.refresh(created_user)
+    add_to_db(created_user, db)
     created_profile = models.Profile(
         username=created_user.username,
         email=created_user.email,
         user_id=created_user.id,
     )
-    db.add(created_profile)
-    db.commit()
-    db.refresh(created_profile)
+    add_to_db(created_profile, db)
     created_unit = models.Unit(user_id=created_user.id)
-    db.add(created_unit)
-    db.commit()
-    db.refresh(created_unit)
+    add_to_db(created_unit, db)
     return created_user
