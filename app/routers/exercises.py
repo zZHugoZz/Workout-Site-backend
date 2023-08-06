@@ -3,7 +3,7 @@ from typing import Annotated
 from sqlalchemy.orm import Session
 from .. import models
 from ..database import get_db
-from .. import schemas
+from ..schemas import Exercise
 
 from .authentication import security
 from ..oauth2 import decode_token
@@ -13,8 +13,8 @@ from fastapi.security import HTTPAuthorizationCredentials
 router = APIRouter(prefix="/exercises", tags=["Exercises"])
 
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=list[schemas.Exercise])
-def get_exercises(
+@router.get("/", status_code=status.HTTP_200_OK, response_model=list[Exercise])
+def search_exercises(
     credentials: HTTPAuthorizationCredentials = Security(security),
     q: Annotated[str | None, Query(max_length=100)] = None,
     db: Session = Depends(get_db),
@@ -27,3 +27,12 @@ def get_exercises(
         if q == "":
             exercises = []
         return exercises
+
+
+@router.get("/", status_code=status.HTTP_200_OK, response_model=list[Exercise])
+def get_exercises(
+    credentials: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(get_db),
+):
+    exercises = db.query(models.Exercise).all()
+    return exercises
