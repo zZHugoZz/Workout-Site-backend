@@ -62,6 +62,9 @@ class Workout(Base):
 
     id = Column(Integer, primary_key=True, nullable=False)
     date = Column(String, nullable=False, server_default="now")
+    # add day column
+    # add month column
+    # add year column
     created_at = Column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
@@ -96,6 +99,7 @@ class Program(Base):
 
     id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String(100), nullable=True, server_default="New program")
+    description = Column(String(300), nullable=True, server_default="No description")
     created_at = Column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
