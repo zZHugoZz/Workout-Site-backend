@@ -101,9 +101,14 @@ class ProgramDay(ProgramDayIn):
     exercises: list[ProgramExercise]
 
 
-class Program(BaseModel):
-    id: int
+class ProgramIn(BaseModel):
     name: str
+    description: str
+    n_days: int
+
+
+class Program(ProgramIn):
+    id: int
     user_id: int
     days: list[ProgramDay]
     created_at: datetime

@@ -98,8 +98,9 @@ class Program(Base):
     __tablename__ = "programs"
 
     id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(String(100), nullable=True, server_default="New program")
-    description = Column(String(300), nullable=True, server_default="No description")
+    name = Column(String(100), nullable=False, server_default="New program")
+    description = Column(String(300), nullable=False, server_default="No description")
+    n_days = Column(Integer, nullable=False, server_default="7")
     created_at = Column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
