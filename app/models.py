@@ -80,7 +80,7 @@ class WorkoutExercise(Base):
 
     id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String(100), nullable=False)
-    sets = Column(Integer, nullable=False)
+    n_sets = Column(Integer, nullable=False)
     reps = Column(Integer, nullable=False)
     weight = Column(Float(precision=1), nullable=False)
     unit = Column(String, nullable=False)
@@ -91,6 +91,21 @@ class WorkoutExercise(Base):
         Integer, ForeignKey("workouts.id", ondelete="CASCADE"), nullable=False
     )
     user_id = Column(Integer, nullable=False)
+    sets = relationship("WorkoutSet")
+
+
+class WorkoutSet(Base):
+    __tablename__ = "workout_sets"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    reps = Column(Integer, nullable=False)
+    weight = Column(Float(precision=1), nullable=False)
+    workout_exercise_id = Column(
+        Integer, ForeignKey("workout_exercises.id", ondelete="CASCADE"), nullable=False
+    )
+    created_at = Column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
+    )
 
 
 # -------------------- programs --------------------
