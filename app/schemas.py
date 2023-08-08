@@ -68,9 +68,6 @@ class WorkoutExerciseIn(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     name: str
     n_sets: int
-    reps: int
-    weight: float
-    unit: str
     workout_id: int
 
 
