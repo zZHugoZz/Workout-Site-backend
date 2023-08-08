@@ -94,8 +94,8 @@ class WorkoutExercise(Base):
     sets = relationship("WorkoutSet")
 
 
-class WorkoutSet(Base):
-    __tablename__ = "workout_sets"
+class WorkoutExerciseSet(Base):
+    __tablename__ = "workout_exercise_sets"
 
     id = Column(Integer, primary_key=True, nullable=False)
     reps = Column(Integer, nullable=False)
