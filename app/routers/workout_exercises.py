@@ -5,10 +5,18 @@ from .. import models
 from ..database import get_db
 from ..schemas import WorkoutExercise, WorkoutExerciseIn
 from .authentication import security
-from ..utils import create, delete, get_item
+from ..utils import create, delete, get_item, get_items
 
 
 router = APIRouter(prefix="/workout_exercises", tags=["Workout Exercises"])
+
+
+@router.get("/", status_code=status.HTTP_200_OK, response_model=list[WorkoutExercise])
+def get_workout_exercises(
+    credentials: HTTPAuthorizationCredentials = Security(security),
+    db: Session = Depends(get_db),
+):
+    return get_items(credentials, db, models.WorkoutExercise)
 
 
 @router.get("/{id}", status_code=status.HTTP_200_OK, response_model=WorkoutExercise)
