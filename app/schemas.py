@@ -176,3 +176,10 @@ class BodyWeightUnitIn(BaseModel):
 class BodyWeightUnit(BodyWeightUnitIn):
     id: int
     user_id: int
+
+
+class ManageData(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    workouts: list[Workout]
+    programs: list[Program]
+    progressions: list[Progression]

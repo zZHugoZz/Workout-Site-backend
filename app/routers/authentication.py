@@ -38,10 +38,11 @@ def login(
     return {"access_token": access_token, "refresh_token": refresh_token}
 
 
-@router.post("/refresh_token")
+@router.get("/refresh_token")
 def refresh(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
     token = credentials.credentials
+    print(token)
     return get_new_access_token(token, db)

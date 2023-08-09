@@ -3,7 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from .. import models
 from ..database import get_db
-from .. import schemas
+from ..schemas import Workout
 from .authentication import security
 from datetime import date
 from ..utils import create, delete, get_items, get_item
@@ -12,7 +12,7 @@ from ..utils import create, delete, get_items, get_item
 router = APIRouter(prefix="/workouts", tags=["Workouts"])
 
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=list[schemas.Workout])
+@router.get("/", status_code=status.HTTP_200_OK, response_model=list[Workout])
 def get_workouts(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
@@ -20,7 +20,7 @@ def get_workouts(
     return get_items(credentials, db, models.Workout)
 
 
-@router.get("/{id}", status_code=status.HTTP_200_OK, response_model=schemas.Workout)
+@router.get("/{id}", status_code=status.HTTP_200_OK, response_model=Workout)
 def get_workout(
     id: int,
     credentials: HTTPAuthorizationCredentials = Security(security),
@@ -29,7 +29,7 @@ def get_workout(
     return get_item(id, credentials, db, models.Workout, "Workout")
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Workout)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=Workout)
 def create_workout(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),

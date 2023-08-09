@@ -17,6 +17,7 @@ from .routers import (
     profiles,
     bodyweights,
     workout_exercise_sets,
+    manage,
 )
 
 
@@ -48,6 +49,7 @@ app.include_router(program_exercises.router)
 app.include_router(progressions.router)
 app.include_router(performances.router)
 app.include_router(units.router)
+app.include_router(manage.router)
 
 app.include_router(bodyweights.router)
 
