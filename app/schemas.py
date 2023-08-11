@@ -19,8 +19,8 @@ class UserOut(BaseUser):
 
 
 class ProfileIn(BaseModel):
-    age: int | None = None
-    gender: str | None = None
+    age: int
+    gender: str
     profile_picture: bytes | None = None
 
 
