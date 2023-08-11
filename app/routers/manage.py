@@ -23,4 +23,10 @@ def get_manage_data(
     progressions = (
         db.query(models.Progression).filter(models.Progression.user_id == user_id).all()
     )
-    return {"workouts": workouts, "programs": programs, "progressions": progressions}
+    unit = db.query(models.Unit).filter(models.Unit.user_id == user_id).first()
+    return {
+        "workouts": workouts,
+        "programs": programs,
+        "progressions": progressions,
+        "unit": unit,
+    }

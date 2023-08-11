@@ -89,10 +89,6 @@ class WorkoutExercise(Base):
     )
     user_id = Column(Integer, nullable=False)
     sets = relationship("WorkoutExerciseSet")
-    unit_id = Column(
-        Integer, ForeignKey("units.id"), nullable=False, server_default="Kg"
-    )
-    unit = relationship("Unit")
 
 
 class WorkoutExerciseSet(Base):

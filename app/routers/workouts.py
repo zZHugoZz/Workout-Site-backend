@@ -34,8 +34,8 @@ def create_workout(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: Session = Depends(get_db),
 ):
-    current_date = {"date": date.today()}
-    return create(credentials, db, models.Workout, additional_data=current_date)
+    additional_data = {"date": date.today()}
+    return create(credentials, db, models.Workout, additional_data=additional_data)
 
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
