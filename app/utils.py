@@ -3,12 +3,12 @@ from fastapi.security import HTTPAuthorizationCredentials
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from app.oauth2 import decode_token
-from . import schemas
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
+# -------------------- encryption --------------------
 def hash(password):
     return pwd_context.hash(password)
 
@@ -17,6 +17,7 @@ def verify(password, hashed_password):
     return pwd_context.verify(password, hashed_password)
 
 
+# -------------------- custom exceptions --------------------
 FORBIDDEN_EXCEPTION = HTTPException(
     status_code=status.HTTP_403_FORBIDDEN,
     detail="Not authorized to perform this action",
@@ -30,6 +31,7 @@ def NOT_FOUND_EXCEPTION(name: str, id: int):
     )
 
 
+# -------------------- CRUD operations --------------------
 def get_items(credentials: HTTPAuthorizationCredentials, db: Session, model):
     user_id = decode_token(credentials.credentials)
     items = db.query(model).filter(model.user_id == user_id).all()

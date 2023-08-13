@@ -2,7 +2,6 @@ from .database import Base
 from sqlalchemy import Column, Float, ForeignKey, Integer, String, TIMESTAMP, text
 from sqlalchemy.dialects.postgresql import BYTEA
 from sqlalchemy.orm import relationship
-from datetime import date
 
 
 # -------------------- users --------------------
