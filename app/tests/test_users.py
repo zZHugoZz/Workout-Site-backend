@@ -3,15 +3,15 @@ from ..main import app
 import random
 
 
+client = TestClient(app)
+CHOICES = "abcdefghijklmnopqrstuvwxyz"
+
+
 def generate_email() -> str:
-    choices = "abcdefghijklmnopqrstuvwxyz"
     name = ""
     for i in range(10):
-        name += random.choice(choices)
+        name += random.choice(CHOICES)
     return f"{name}@gmail.com"
-
-
-client = TestClient(app)
 
 
 def test_create_user():
