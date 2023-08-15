@@ -3,6 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from app.oauth2 import decode_token
+from sqlalchemy import select
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -35,6 +36,9 @@ def NOT_FOUND_EXCEPTION(name: str, id: int):
 def get_items(credentials: HTTPAuthorizationCredentials, db: Session, model):
     user_id = decode_token(credentials.credentials)
     items = db.query(model).filter(model.user_id == user_id).all()
+    # query = select(model).where(model.user_id == user_id)
+    # items = db.execute(query).all()
+    # print(items)
     return items
 
 
