@@ -16,7 +16,7 @@ from sqlalchemy.orm import Mapped, mapped_column, Session
 from sqlalchemy.dialects.postgresql import BYTEA
 from sqlalchemy.orm import relationship
 from .schemas import UserIn
-from .utils import hash
+from .utils import hash, add_to_db
 
 
 # -------------------- users --------------------
@@ -55,9 +55,15 @@ class User(Base):
     def create_user(cls, user: UserIn, session: Session) -> Self:
         user.password = hash(user.password)
         created_user = cls(**user.model_dump())
-        session.add(created_user)
-        session.commit()
-        session.refresh(created_user)
+        add_to_db(created_user, session)
+        created_profile = Profile(
+            username=created_user.username,
+            email=created_user.email,
+            user_id=created_user.id,
+        )
+        add_to_db(created_profile, session)
+        created_unit = Unit(user_id=created_user.id)
+        add_to_db(created_unit, session)
         return created_user
 
 
