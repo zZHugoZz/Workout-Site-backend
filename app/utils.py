@@ -1,6 +1,8 @@
+from typing import Sequence
 from fastapi import HTTPException, Response, status
 from fastapi.security import HTTPAuthorizationCredentials
 from passlib.context import CryptContext
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.oauth2 import decode_token
@@ -10,11 +12,11 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 # -------------------- encryption --------------------
-def hash(password):
+def hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def verify(password, hashed_password):
+def verify(password: str, hashed_password: str) -> bool:
     return pwd_context.verify(password, hashed_password)
 
 
@@ -33,26 +35,40 @@ def NOT_FOUND_EXCEPTION(name: str, id: int) -> HTTPException:
 
 
 # -------------------- CRUD operations --------------------
-def get_items(credentials: HTTPAuthorizationCredentials, db: Session, model):
+async def get_items(
+    credentials: HTTPAuthorizationCredentials, db: Session, model
+) -> Sequence:
+    # user_id = decode_token(credentials.credentials)
+    # items = db.query(model).filter(model.user_id == user_id).all()
+    # return items
     user_id = decode_token(credentials.credentials)
-    items = db.query(model).filter(model.user_id == user_id).all()
+    query = select(model).where(model.user_id == user_id)
+    items = await db.execute(query).scalars().all()
     return items
 
 
-def get_item(
+async def get_item(
     id: int,
     credentials: HTTPAuthorizationCredentials,
     db: Session,
     model,
     model_name: str,
-):
+) -> any:
+    # user_id = decode_token(credentials.credentials)
+    # query = db.query(model).filter(model.id == id)
+    # if query.first() is None:
+    #     raise NOT_FOUND_EXCEPTION(model_name, id)
+    # if query.first().user_id != user_id:
+    #     raise FORBIDDEN_EXCEPTION
+    # return query.first()
     user_id = decode_token(credentials.credentials)
-    query = db.query(model).filter(model.id == id)
-    if query.first() is None:
+    query = select(model).where(model.id == id)
+    if await db.execute(query).first() is None:
         raise NOT_FOUND_EXCEPTION(model_name, id)
-    if query.first().user_id != user_id:
+    if await db.execute(query).user_id != user_id:
         raise FORBIDDEN_EXCEPTION
-    return query.first()
+    item = await db.execute(query).scalars().first()
+    return item
 
 
 def create(

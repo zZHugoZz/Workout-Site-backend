@@ -1,6 +1,6 @@
 from fastapi import Depends, status, APIRouter, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from .. import models
+from ..models.users import User
 from ..database import get_db
 from .. import schemas
 
@@ -10,22 +10,19 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=list[schemas.UserOut])
 async def get_users(db: AsyncSession = Depends(get_db)):
-    users = await models.User.get_users(db)
+    users = await User.get_users(db)
     return users
 
 
 @router.get("/{id}", status_code=status.HTTP_200_OK, response_model=schemas.UserOut)
 async def get_user(id: int, db: AsyncSession = Depends(get_db)):
-    user = await models.User.get_user(db, id)
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with id: {id} doesn't exist",
-        )
+    user = await User.get_user(db, id)
     return user
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 async def create_user(user: schemas.UserIn, db: AsyncSession = Depends(get_db)):
-    created_user = await models.User.create_user(user, db)
+    print("user:", user)
+    created_user = await User.create_user(user, db)
+    print("created_users: ", created_user)
     return created_user

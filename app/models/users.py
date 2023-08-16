@@ -1,10 +1,11 @@
 from typing import Self
+from fastapi import HTTPException, status
 from pydantic import EmailStr
 from sqlalchemy import String, select, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import BYTEA
-from ..utils import add_to_db
+from ..utils import add_to_db, hash
 from .base import BaseModel
 from ..schemas import UserIn
 
@@ -29,8 +30,14 @@ class User(BaseModel):
     @classmethod
     async def get_user(cls, session: AsyncSession, id: int) -> Self:
         query = select(cls).where(cls.id == id)
-        user = await session.execute(query)
-        return user.scalar()
+        exec = await session.execute(query)
+        user = exec.scalars().first()
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"User with id: {id} doesn't exist",
+            )
+        return user
 
     @classmethod
     async def create_user(cls, user: UserIn, session: AsyncSession) -> Self:
