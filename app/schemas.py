@@ -4,7 +4,6 @@ from datetime import datetime
 
 # -------------------- users --------------------
 class BaseUser(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
     username: str
     email: EmailStr
 
@@ -77,12 +76,12 @@ class WorkoutExercise(WorkoutExerciseIn):
 
 
 class Workout(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     date: str
     created_at: datetime
     user_id: int
-    user: UserOut
-    exercises: list[WorkoutExercise]
+    # exercises: list[WorkoutExercise]
 
 
 # -------------------- programs --------------------

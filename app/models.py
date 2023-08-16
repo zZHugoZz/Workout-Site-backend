@@ -1,20 +1,64 @@
+from datetime import datetime
+from typing import Self
+from fastapi import HTTPException, status
 from .database import Base
-from sqlalchemy import Column, Float, ForeignKey, Integer, String, TIMESTAMP, text
+from sqlalchemy import (
+    Column,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    TIMESTAMP,
+    text,
+    select,
+)
+from sqlalchemy.orm import Mapped, mapped_column, Session
 from sqlalchemy.dialects.postgresql import BYTEA
 from sqlalchemy.orm import relationship
+from .schemas import UserIn
+from .utils import hash
 
 
 # -------------------- users --------------------
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    username = Column(String(150), nullable=False)
-    email = Column(String(100), nullable=False, unique=True)
-    password = Column(String(100), nullable=False)
-    created_at = Column(
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(String(100), nullable=False)
+    email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    password: Mapped[str] = mapped_column(String(100), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
+
+    def __repr__(self) -> str:
+        return f"User(id={self.id}, username={self.username} email={self.email})"
+
+    @classmethod
+    def get_users(cls, session: Session) -> list[Self]:
+        query = select(cls)
+        users = session.execute(query).scalars()
+        return users
+
+    @classmethod
+    def get_user(cls, session: Session, id: int) -> Self:
+        query = select(cls).where(cls.id == id)
+        user = session.execute(query).scalar()
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"User with id: {id} doesn't exist",
+            )
+        return user
+
+    @classmethod
+    def create_user(cls, user: UserIn, session: Session) -> Self:
+        user.password = hash(user.password)
+        created_user = cls(**user.model_dump())
+        session.add(created_user)
+        session.commit()
+        session.refresh(created_user)
+        return created_user
 
 
 class Profile(Base):
@@ -59,19 +103,28 @@ class Exercise(Base):
 class Workout(Base):
     __tablename__ = "workouts"
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    date = Column(String, nullable=False, server_default="now")
-    # add day column
-    # add month column
-    # add year column
-    created_at = Column(
+    # id = Column(Integer, primary_key=True, nullable=False)
+    # date = Column(String, nullable=False, server_default="now")
+    # created_at = Column(
+    #     TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
+    # )
+    # user_id = Column(
+    #     Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    # )
+    # user = relationship("User")
+    # exercises = relationship("WorkoutExercise")
+    id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
+    date: Mapped[str] = mapped_column(
+        String(50), nullable=False, server_default="today"
+    )
+    created_at = mapped_column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
-    user_id = Column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
-    )
-    user = relationship("User")
-    exercises = relationship("WorkoutExercise")
+    user_id = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user: Mapped[User] = relationship()
+
+    def __repr__(self) -> str:
+        return f"Workout(id={self.id}, date={self.date})"
 
 
 class WorkoutExercise(Base):
