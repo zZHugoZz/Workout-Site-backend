@@ -2,8 +2,8 @@ from fastapi import HTTPException, Response, status
 from fastapi.security import HTTPAuthorizationCredentials
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.oauth2 import decode_token
-from sqlalchemy import select
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -25,7 +25,7 @@ FORBIDDEN_EXCEPTION = HTTPException(
 )
 
 
-def NOT_FOUND_EXCEPTION(name: str, id: int):
+def NOT_FOUND_EXCEPTION(name: str, id: int) -> HTTPException:
     return HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"{name.capitalize()} with id: {id} doesn't exist",
@@ -80,7 +80,7 @@ def delete(
     db: Session,
     model,
     model_name: str,
-):
+) -> Response:
     user_id = decode_token(credentials.credentials)
     query = db.query(model).filter(model.id == id)
     if query.first() is None:
@@ -111,7 +111,7 @@ def update(
     return query.first()
 
 
-def add_to_db(created_item, db: Session):
+async def add_to_db(created_item, db: AsyncSession):
     db.add(created_item)
-    db.commit()
-    db.refresh(created_item)
+    await db.commit()
+    await db.refresh(created_item)
