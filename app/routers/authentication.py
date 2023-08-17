@@ -1,6 +1,5 @@
 from typing import Annotated
-from fastapi import Depends, status, HTTPException, APIRouter, Security
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, status, HTTPException, APIRouter
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,7 +12,6 @@ from ..dependencies import common_deps
 
 
 router = APIRouter(tags=["Authentication"])
-security = HTTPBearer()
 
 
 @router.post("/login", status_code=status.HTTP_200_OK, response_model=schemas.Token)

@@ -2,7 +2,7 @@ from typing import Self
 from fastapi import HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import EmailStr
-from sqlalchemy import String, select, ForeignKey
+from sqlalchemy import String, select, ForeignKey, update
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import BYTEA
@@ -70,6 +70,29 @@ class Profile(BaseModel):
 
     def __repr__(self) -> str:
         return f"Profile(id={self.id}, username={self.username}, email={self.email}, user_id={self.user_id})"
+
+    @classmethod
+    async def get_profile(
+        cls, credentials: HTTPAuthorizationCredentials, session: AsyncSession
+    ) -> Self:
+        user_id = oauth2.decode_token(credentials.credentials)
+        select_stmt = select(cls).where(cls.user_id == user_id)
+        exec = await session.execute(select_stmt)
+        profile = exec.scalars().first()
+        return profile
+
+    @classmethod
+    async def update_profile(
+        cls,
+        credentials: HTTPAuthorizationCredentials,
+        session: AsyncSession,
+        new_values: dict,
+    ) -> Self:
+        user_id = oauth2.decode_token(credentials.credentials)
+        update_stmt = update(cls).where(cls.user_id == user_id).values(new_values)
+        exec = await session.execute(update_stmt)
+        updated_profile = exec.fetchall()
+        return updated_profile
 
 
 class Unit(BaseModel):
