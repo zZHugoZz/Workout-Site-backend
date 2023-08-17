@@ -10,7 +10,7 @@ from .generic_exceptions import NOT_FOUND_EXCEPTION, FORBIDDEN_EXCEPTION
 async def get_items(
     credentials: HTTPAuthorizationCredentials, db: AsyncSession, model
 ) -> Sequence:
-    user_id = oauth2.oauth2.decode_token(credentials.credentials)
+    user_id = oauth2.decode_token(credentials.credentials)
     query = select(model).where(model.user_id == user_id)
     exec = await db.execute(query)
     items = exec.scalars().all()

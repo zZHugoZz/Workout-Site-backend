@@ -1,46 +1,48 @@
 from fastapi import APIRouter, status
-from ..schemas import WorkoutExerciseSet, WorkoutExerciseSetIn
-from ..utils import create, get_item, delete
-from .. import models
+from .. import schemas
+from ..utils import generic_operations
+from ..models import workouts
 from ..dependencies import common_deps
 
 
 router = APIRouter(prefix="/workout_exercise_sets", tags=["Workout exercise sets"])
 
 
-@router.get("/{id}", status_code=status.HTTP_200_OK, response_model=WorkoutExerciseSet)
-def get_workout_exercise_set(id: int, params: common_deps):
-    return get_item(
+@router.get(
+    "/{id}", status_code=status.HTTP_200_OK, response_model=schemas.WorkoutExerciseSet
+)
+async def get_workout_exercise_set(id: int, params: common_deps):
+    return await generic_operations.get_item(
         id,
         params["credentials"],
         params["db"],
-        models.WorkoutExerciseSet,
+        workouts.WorkoutExerciseSet,
         "Workout exercise set",
     )
 
 
 @router.post(
-    "/", status_code=status.HTTP_201_CREATED, response_model=WorkoutExerciseSet
+    "/", status_code=status.HTTP_201_CREATED, response_model=schemas.WorkoutExerciseSet
 )
-def create_workout_exercise_set(
-    workout_exercise_set: WorkoutExerciseSetIn, params: common_deps
+async def create_workout_exercise_set(
+    workout_exercise_set: schemas.WorkoutExerciseSetIn, params: common_deps
 ):
-    return create(
+    return await generic_operations.create_item(
         params["credentials"],
         params["db"],
-        models.WorkoutExerciseSet,
+        workouts.WorkoutExerciseSet,
         workout_exercise_set,
     )
 
 
 @router.delete(
-    "/{id}", status_code=status.HTTP_200_OK, response_model=WorkoutExerciseSet
+    "/{id}", status_code=status.HTTP_200_OK, response_model=schemas.WorkoutExerciseSet
 )
-def delete_workout_exercise_set(id: int, params: common_deps):
-    return delete(
+async def delete_workout_exercise_set(id: int, params: common_deps):
+    return await generic_operations.delete_item(
         id,
         params["credentials"],
         params["db"],
-        models.WorkoutExerciseSet,
+        workouts.WorkoutExerciseSet,
         "Workout exercise set",
     )

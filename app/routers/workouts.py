@@ -26,7 +26,7 @@ async def get_workout(id: int, params: common_deps):
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Workout)
 async def create_workout(params: common_deps):
     additional_data = {"date": str(date.today())}
-    return await create(
+    return await generic_operations.create_item(
         params["credentials"],
         params["db"],
         workouts.Workout,
@@ -36,6 +36,6 @@ async def create_workout(params: common_deps):
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
 async def delete_workout(id: int, params: common_deps):
-    return await delete(
+    return await generic_operations.delete_item(
         id, params["credentials"], params["db"], workouts.Workout, "Workout"
     )
