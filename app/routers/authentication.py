@@ -1,15 +1,15 @@
 from typing import Annotated
 from fastapi import Depends, status, HTTPException, APIRouter, Security
-from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..models import users
 from ..database import get_db
 from .. import schemas
 from ..utils import encryption
 from .. import oauth2
+from ..dependencies import common_deps
 
 
 router = APIRouter(tags=["Authentication"])
@@ -41,10 +41,6 @@ async def login(
 
 
 @router.get("/refresh_token")
-def refresh(
-    credentials: HTTPAuthorizationCredentials = Security(security),
-    db: Session = Depends(get_db),
-):
-    token = credentials.credentials
-    print(token)
-    return oauth2.get_new_access_token(token, db)
+async def refresh(params: common_deps):
+    token = params["credentials"].credentials
+    return await oauth2.get_new_access_token(token, params["db"])

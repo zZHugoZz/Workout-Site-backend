@@ -1,5 +1,6 @@
 from typing import Self
 from fastapi import HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import EmailStr
 from sqlalchemy import String, select, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -8,6 +9,7 @@ from sqlalchemy.dialects.postgresql import BYTEA
 from ..utils import generic_operations
 from .base import BaseModel
 from .. import schemas
+from .. import oauth2
 
 
 class User(BaseModel):
@@ -78,3 +80,13 @@ class Unit(BaseModel):
 
     def __repr__(self) -> str:
         return f"Unit(id={self.id}, unit={self.unit}, user_id={self.user_id})"
+
+    @classmethod
+    async def get_unit(
+        cls, credentials: HTTPAuthorizationCredentials, session: AsyncSession
+    ) -> Self:
+        user_id = oauth2.decode_token(credentials.credentials)
+        select_stmt = select(cls).where(cls.user_id == user_id)
+        exec = await session.execute(select_stmt)
+        unit = exec.scalars().first()
+        return unit
