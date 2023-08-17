@@ -1,4 +1,4 @@
-from fastapi import Depends, status, APIRouter, HTTPException
+from fastapi import Depends, status, APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..models.users import User
 from ..database import get_db
@@ -22,7 +22,6 @@ async def get_user(id: int, db: AsyncSession = Depends(get_db)):
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 async def create_user(user: schemas.UserIn, db: AsyncSession = Depends(get_db)):
-    print("user:", user)
     created_user = await User.create_user(user, db)
-    print("created_users: ", created_user)
+    print("user: ", created_user)
     return created_user

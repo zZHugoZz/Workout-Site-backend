@@ -2,7 +2,7 @@ from typing import Sequence
 from fastapi import HTTPException, Response, status
 from fastapi.security import HTTPAuthorizationCredentials
 from passlib.context import CryptContext
-from sqlalchemy import select
+from sqlalchemy import select, update, insert
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.oauth2 import decode_token
@@ -36,21 +36,22 @@ def NOT_FOUND_EXCEPTION(name: str, id: int) -> HTTPException:
 
 # -------------------- CRUD operations --------------------
 async def get_items(
-    credentials: HTTPAuthorizationCredentials, db: Session, model
+    credentials: HTTPAuthorizationCredentials, db: AsyncSession, model
 ) -> Sequence:
     # user_id = decode_token(credentials.credentials)
     # items = db.query(model).filter(model.user_id == user_id).all()
     # return items
     user_id = decode_token(credentials.credentials)
     query = select(model).where(model.user_id == user_id)
-    items = await db.execute(query).scalars().all()
+    exec = await db.execute(query)
+    items = exec.scalars().all()
     return items
 
 
 async def get_item(
     id: int,
     credentials: HTTPAuthorizationCredentials,
-    db: Session,
+    db: AsyncSession,
     model,
     model_name: str,
 ) -> any:
@@ -63,68 +64,91 @@ async def get_item(
     # return query.first()
     user_id = decode_token(credentials.credentials)
     query = select(model).where(model.id == id)
-    if await db.execute(query).first() is None:
+    exec = await db.execute(query)
+    item = exec.scalars().first()
+    if item is None:
         raise NOT_FOUND_EXCEPTION(model_name, id)
-    if await db.execute(query).user_id != user_id:
+    if item.user_id != user_id:
         raise FORBIDDEN_EXCEPTION
-    item = await db.execute(query).scalars().first()
     return item
 
 
-def create(
+async def create(
     credentials: HTTPAuthorizationCredentials,
-    db: Session,
+    db: AsyncSession,
     model,
     data=None,
     additional_data: dict = {},
-):
+) -> any:
     user_id = decode_token(credentials.credentials)
     created_item = (
         model(**data.model_dump(), **additional_data, user_id=user_id)
         if data is not None
         else model(**additional_data, user_id=user_id)
     )
-    db.add(created_item)
-    db.commit()
-    db.refresh(created_item)
+    # db.add(created_item)
+    # db.commit()
+    # db.refresh(created_item)
+    # return created_item
+    await add_to_db(created_item, db)
     return created_item
 
 
-def delete(
+async def delete(
     id: int,
     credentials: HTTPAuthorizationCredentials,
-    db: Session,
+    db: AsyncSession,
     model,
     model_name: str,
 ) -> Response:
     user_id = decode_token(credentials.credentials)
-    query = db.query(model).filter(model.id == id)
-    if query.first() is None:
+    # query = db.query(model).filter(model.id == id)
+    # if query.first() is None:
+    #     raise NOT_FOUND_EXCEPTION(model_name, id)
+    # if query.first().user_id != user_id:
+    #     raise FORBIDDEN_EXCEPTION
+    # query.delete()
+    # db.commit()
+    # return Response(status_code=status.HTTP_204_NO_CONTENT)
+    query = select(model).where(model.id == id)
+    exec = await db.execute(query)
+    item_to_delete = exec.scalars().first()
+    if item_to_delete is None:
         raise NOT_FOUND_EXCEPTION(model_name, id)
-    if query.first().user_id != user_id:
+    if item_to_delete.user_id != user_id:
         raise FORBIDDEN_EXCEPTION
-    query.delete()
-    db.commit()
+    db.delete(item_to_delete)
+    await db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-def update(
+async def update(
     id: int,
     updated_item,
     credentials: HTTPAuthorizationCredentials,
-    db: Session,
+    db: AsyncSession,
     model,
     model_name: str,
-):
+) -> any:
     user_id = decode_token(credentials.credentials)
-    query = db.query(model).filter(model.id == id)
-    if query.first() is None:
+    # query = db.query(model).filter(model.id == id)
+    # if query.first() is None:
+    #     raise NOT_FOUND_EXCEPTION(model_name, id)
+    # if query.first().user_id != user_id:
+    #     raise FORBIDDEN_EXCEPTION
+    # query.update(updated_item.model_dump())
+    # db.commit()
+    # return query.first()
+    query = select(model).where(model.id == id)
+    exec = await db.execute(query)
+    item_to_update = exec.scalars().first()
+    if item_to_update is None:
         raise NOT_FOUND_EXCEPTION(model_name, id)
-    if query.first().user_id != user_id:
+    if item_to_update.user_id != user_id:
         raise FORBIDDEN_EXCEPTION
-    query.update(updated_item.model_dump())
-    db.commit()
-    return query.first()
+    query = update(model).values(updated_item.model_dump())
+    await db.execute(query)
+    return model
 
 
 async def add_to_db(created_item, db: AsyncSession):

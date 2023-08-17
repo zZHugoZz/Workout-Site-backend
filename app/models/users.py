@@ -1,7 +1,7 @@
 from typing import Self
 from fastapi import HTTPException, status
 from pydantic import EmailStr
-from sqlalchemy import String, select, ForeignKey
+from sqlalchemy import String, insert, select, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import BYTEA
