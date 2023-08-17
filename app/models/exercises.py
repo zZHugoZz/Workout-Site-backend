@@ -1,5 +1,7 @@
-from sqlalchemy import String
+from typing import Self
+from sqlalchemy import String, select
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.ext.asyncio import AsyncSession
 from .base import BaseModel
 
 
@@ -11,3 +13,10 @@ class Exercise(BaseModel):
 
     def __repr__(self) -> str:
         return f"Exercise(name={self.name}, link={self.link}, ...)"
+
+    @classmethod
+    async def get_exercises(cls, session: AsyncSession) -> list[Self | None]:
+        select_stmt = select(cls)
+        exec = await session.execute(select_stmt)
+        exercises = exec.scalars().all()
+        return exercises

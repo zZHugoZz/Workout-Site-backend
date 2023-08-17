@@ -1,7 +1,7 @@
 from typing import Sequence
 from fastapi import Response, status
 from fastapi.security import HTTPAuthorizationCredentials
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from .. import oauth2
 from .generic_exceptions import NOT_FOUND_EXCEPTION, FORBIDDEN_EXCEPTION
@@ -35,7 +35,7 @@ async def get_item(
     return item
 
 
-async def create(
+async def create_item(
     credentials: HTTPAuthorizationCredentials,
     db: AsyncSession,
     model,
@@ -52,7 +52,7 @@ async def create(
     return created_item
 
 
-async def delete(
+async def delete_item(
     id: int,
     credentials: HTTPAuthorizationCredentials,
     db: AsyncSession,
@@ -75,7 +75,7 @@ async def delete(
 """ Take a look later """
 
 
-async def update(
+async def update_item(
     id: int,
     updated_item,
     credentials: HTTPAuthorizationCredentials,

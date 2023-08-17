@@ -1,8 +1,11 @@
-from fastapi import HTTPException, status
-import jwt
+from typing import Mapping
 from datetime import datetime, timedelta
+import jwt
+from fastapi import HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from .config import settings
-from . import models
+from .models import blacklisted_tokens as blt
 
 
 SECRET_KEY = settings.secret_key
@@ -12,7 +15,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 REFRESH_TOKEN_EXPIRE_MINUTES = settings.refresh_token_expire_minutes
 
 
-def encode_token(user_id):
+def encode_token(user_id: int) -> bytes:
     payload = {
         "exp": datetime.utcnow()
         + timedelta(days=0, minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
@@ -23,12 +26,11 @@ def encode_token(user_id):
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
-def decode_token(token):
+def decode_token(token: any) -> Mapping:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         if payload["scope"] == "access_token":
             return payload["sub"]
-
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Scope for the token is invalid",
@@ -43,7 +45,7 @@ def decode_token(token):
         )
 
 
-def encode_refresh_token(user_id):
+def encode_refresh_token(user_id: int) -> bytes:
     payload = {
         "exp": datetime.utcnow()
         + timedelta(days=0, minutes=REFRESH_TOKEN_EXPIRE_MINUTES),
@@ -54,28 +56,26 @@ def encode_refresh_token(user_id):
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
-def get_new_access_token(refresh_token, db):
+async def get_new_access_token(refresh_token: any, db: AsyncSession) -> dict:
     try:
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         if payload["scope"] == "refresh_token":
-            if (
-                db.query(models.BlackListedToken)
-                .filter(models.BlackListedToken.token == refresh_token)
-                .first()
-                is not None
-            ):
+            select_stmt = select(blt.BlackListedToken).where(
+                blt.BlackListedToken.token == refresh_token
+            )
+            exec = await db.execute(select_stmt)
+            blacklisted_token = exec.scalars().first()
+            if blacklisted_token is not None:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid token"
                 )
-
             user_id = payload["sub"]
             new_token = encode_token(user_id)
             new_refresh_token = encode_refresh_token(user_id)
-            used_token = models.BlackListedToken(token=refresh_token)
-            db.add(used_token)
-            db.commit()
+            used_token = blt.BlackListedToken(token=refresh_token)
+            await db.add(used_token)
+            await db.commit()
             return {"access_token": new_token, "refresh_token": new_refresh_token}
-
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid scope for token"
         )
