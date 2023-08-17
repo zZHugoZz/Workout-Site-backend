@@ -1,47 +1,16 @@
 from typing import Sequence
-from fastapi import HTTPException, Response, status
+from fastapi import Response, status
 from fastapi.security import HTTPAuthorizationCredentials
-from passlib.context import CryptContext
-from sqlalchemy import select, update, insert
-from sqlalchemy.orm import Session
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.oauth2 import decode_token
+from .. import oauth2
+from .generic_exceptions import NOT_FOUND_EXCEPTION, FORBIDDEN_EXCEPTION
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-# -------------------- encryption --------------------
-def hash(password: str) -> str:
-    return pwd_context.hash(password)
-
-
-def verify(password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(password, hashed_password)
-
-
-# -------------------- custom exceptions --------------------
-FORBIDDEN_EXCEPTION = HTTPException(
-    status_code=status.HTTP_403_FORBIDDEN,
-    detail="Not authorized to perform this action",
-)
-
-
-def NOT_FOUND_EXCEPTION(name: str, id: int) -> HTTPException:
-    return HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"{name.capitalize()} with id: {id} doesn't exist",
-    )
-
-
-# -------------------- CRUD operations --------------------
 async def get_items(
     credentials: HTTPAuthorizationCredentials, db: AsyncSession, model
 ) -> Sequence:
-    # user_id = decode_token(credentials.credentials)
-    # items = db.query(model).filter(model.user_id == user_id).all()
-    # return items
-    user_id = decode_token(credentials.credentials)
+    user_id = oauth2.oauth2.decode_token(credentials.credentials)
     query = select(model).where(model.user_id == user_id)
     exec = await db.execute(query)
     items = exec.scalars().all()
@@ -55,14 +24,7 @@ async def get_item(
     model,
     model_name: str,
 ) -> any:
-    # user_id = decode_token(credentials.credentials)
-    # query = db.query(model).filter(model.id == id)
-    # if query.first() is None:
-    #     raise NOT_FOUND_EXCEPTION(model_name, id)
-    # if query.first().user_id != user_id:
-    #     raise FORBIDDEN_EXCEPTION
-    # return query.first()
-    user_id = decode_token(credentials.credentials)
+    user_id = oauth2.decode_token(credentials.credentials)
     query = select(model).where(model.id == id)
     exec = await db.execute(query)
     item = exec.scalars().first()
@@ -80,16 +42,12 @@ async def create(
     data=None,
     additional_data: dict = {},
 ) -> any:
-    user_id = decode_token(credentials.credentials)
+    user_id = oauth2.decode_token(credentials.credentials)
     created_item = (
         model(**data.model_dump(), **additional_data, user_id=user_id)
         if data is not None
         else model(**additional_data, user_id=user_id)
     )
-    # db.add(created_item)
-    # db.commit()
-    # db.refresh(created_item)
-    # return created_item
     await add_to_db(created_item, db)
     return created_item
 
@@ -101,15 +59,7 @@ async def delete(
     model,
     model_name: str,
 ) -> Response:
-    user_id = decode_token(credentials.credentials)
-    # query = db.query(model).filter(model.id == id)
-    # if query.first() is None:
-    #     raise NOT_FOUND_EXCEPTION(model_name, id)
-    # if query.first().user_id != user_id:
-    #     raise FORBIDDEN_EXCEPTION
-    # query.delete()
-    # db.commit()
-    # return Response(status_code=status.HTTP_204_NO_CONTENT)
+    user_id = oauth2.decode_token(credentials.credentials)
     query = select(model).where(model.id == id)
     exec = await db.execute(query)
     item_to_delete = exec.scalars().first()
@@ -117,9 +67,12 @@ async def delete(
         raise NOT_FOUND_EXCEPTION(model_name, id)
     if item_to_delete.user_id != user_id:
         raise FORBIDDEN_EXCEPTION
-    db.delete(item_to_delete)
+    await db.delete(item_to_delete)
     await db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+""" Take a look later """
 
 
 async def update(
@@ -130,7 +83,7 @@ async def update(
     model,
     model_name: str,
 ) -> any:
-    user_id = decode_token(credentials.credentials)
+    user_id = oauth2.decode_token(credentials.credentials)
     # query = db.query(model).filter(model.id == id)
     # if query.first() is None:
     #     raise NOT_FOUND_EXCEPTION(model_name, id)
@@ -148,6 +101,7 @@ async def update(
         raise FORBIDDEN_EXCEPTION
     query = update(model).values(updated_item.model_dump())
     await db.execute(query)
+    await db.commit()
     return model
 
 

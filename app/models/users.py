@@ -1,13 +1,13 @@
 from typing import Self
 from fastapi import HTTPException, status
 from pydantic import EmailStr
-from sqlalchemy import String, insert, select, ForeignKey
+from sqlalchemy import String, select, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import BYTEA
-from ..utils import add_to_db, hash
+from ..utils import generic_operations
 from .base import BaseModel
-from ..schemas import UserIn
+from .. import schemas
 
 
 class User(BaseModel):
@@ -40,18 +40,18 @@ class User(BaseModel):
         return user
 
     @classmethod
-    async def create_user(cls, user: UserIn, session: AsyncSession) -> Self:
+    async def create_user(cls, user: schemas.UserIn, session: AsyncSession) -> Self:
         user.password = hash(user.password)
         created_user = cls(**user.model_dump())
-        await add_to_db(created_user, session)
+        await generic_operations.add_to_db(created_user, session)
         created_profile = Profile(
             username=created_user.username,
             email=created_user.email,
             user_id=created_user.id,
         )
-        await add_to_db(created_profile, session)
+        await generic_operations.add_to_db(created_profile, session)
         created_unit = Unit(user_id=created_user.id)
-        await add_to_db(created_unit, session)
+        await generic_operations.add_to_db(created_unit, session)
         return created_user
 
 
