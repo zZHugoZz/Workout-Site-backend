@@ -91,7 +91,7 @@ class Profile(BaseModel):
         user_id = oauth2.decode_token(credentials.credentials)
         update_stmt = update(cls).where(cls.user_id == user_id).values(new_values)
         exec = await session.execute(update_stmt)
-        updated_profile = exec.fetchall()
+        updated_profile = exec.fetchone()
         return updated_profile
 
 
@@ -113,3 +113,16 @@ class Unit(BaseModel):
         exec = await session.execute(select_stmt)
         unit = exec.scalars().first()
         return unit
+
+    @classmethod
+    async def update_unit(
+        cls,
+        credentials: HTTPAuthorizationCredentials,
+        session: AsyncSession,
+        new_values: dict,
+    ) -> Self:
+        user_id = oauth2.decode_token(credentials.credentials)
+        update_stmt = update(cls).where(cls.user_id == user_id).values(new_values)
+        exec = await session.execute(update_stmt)
+        updated_unit = exec.fetchone()
+        return updated_unit

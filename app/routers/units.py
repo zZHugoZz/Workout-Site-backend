@@ -1,26 +1,19 @@
 from fastapi import APIRouter, status
-from app.oauth2 import decode_token
-from ..schemas import Unit, UnitIn
-from .. import models
+from .. import schemas
+from ..models import users
 from ..dependencies import common_deps
 
 
 router = APIRouter(prefix="/units", tags=["Units"])
 
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=Unit)
-def get_unit(params: common_deps):
-    user_id = decode_token(params["credentials"].credentials)
-    unit = (
-        params["db"].query(models.Unit).filter(models.Unit.user_id == user_id).first()
+@router.get("/", status_code=status.HTTP_200_OK, response_model=schemas.Unit)
+async def get_unit(params: common_deps):
+    return await users.Unit.get_unit(params["credentials"], params["db"])
+
+
+@router.put("/", status_code=status.HTTP_200_OK, response_model=schemas.Unit)
+async def update_unit(unit: schemas.UnitIn, params: common_deps):
+    return await users.Unit.update_unit(
+        params["credentials"], params["db"], unit.model_dump()
     )
-    return unit
-
-
-@router.put("/", status_code=status.HTTP_200_OK, response_model=Unit)
-def update_unit(unit: UnitIn, params: common_deps):
-    user_id = decode_token(params["credentials"].credentials)
-    query = params["db"].query(models.Unit).filter(models.Unit.user_id == user_id)
-    query.update(unit.model_dump())
-    params["db"].commit()
-    return query.first()
