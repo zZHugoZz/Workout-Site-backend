@@ -2,23 +2,25 @@ from typing import Self
 from fastapi import HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import EmailStr
-from sqlalchemy import String, select, ForeignKey, update
+from sqlalchemy import Column, String, select, ForeignKey, update
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import BYTEA
 from ..utils import generic_operations
-from .base import BaseModel
+from .base import BaseModel, Base
 from .. import schemas
 from .. import oauth2
 
 
-class User(BaseModel):
+class User(Base):
     __tablename__ = "users"
 
+    id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(100), nullable=False)
-    profile: Mapped["Profile"] = relationship(back_populates="user")
+    # profile: Mapped["Profile"] = relationship("Profile", back_populates="user")
+    profile = relationship("Profile")
 
     def __repr__(self) -> str:
         return f"User(id={self.id}, username={self.username} email={self.email})"
@@ -57,16 +59,18 @@ class User(BaseModel):
         return created_user
 
 
-class Profile(BaseModel):
+class Profile(Base):
     __tablename__ = "profiles"
 
+    id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[EmailStr] = mapped_column(String(100), nullable=False)
     age: Mapped[int] = mapped_column(nullable=True)
     gender: Mapped[str] = mapped_column(String(100), nullable=True)
     profile_picture: Mapped[bytes] = mapped_column(BYTEA, nullable=True)
     user_id = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    user: Mapped["User"] = relationship(back_populates="profile")
+    # user: Mapped["User"] = relationship("User", back_populates="profile")
+    user = relationship("User")
 
     def __repr__(self) -> str:
         return f"Profile(id={self.id}, username={self.username}, email={self.email}, user_id={self.user_id})"
@@ -95,9 +99,10 @@ class Profile(BaseModel):
         return updated_profile
 
 
-class Unit(BaseModel):
+class Unit(Base):
     __tablename__ = "units"
 
+    id: Mapped[int] = mapped_column(primary_key=True)
     unit: Mapped[str] = mapped_column(String(100), nullable=False, server_default="Kg")
     user_id = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 

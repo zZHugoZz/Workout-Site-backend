@@ -26,6 +26,7 @@ class WorkoutExercise(BaseModel):
     workout_id = mapped_column(
         ForeignKey("workouts.id", ondelete="CASCADE"), nullable=False
     )
+    sets: Mapped[list["WorkoutExerciseSet"]] = relationship("WorkoutExerciseSet")
 
     def __repr__(self) -> str:
         return (
@@ -38,7 +39,7 @@ class WorkoutExerciseSet(BaseModel):
 
     reps: Mapped[int] = mapped_column(nullable=False)
     weight: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
-    workout_exercise_id = mapped_column(
+    workout_exercise_id: Mapped[int] = mapped_column(
         ForeignKey("workout_exercises.id", ondelete="CASCADE"), nullable=False
     )
     user_id: Mapped[int] = mapped_column(nullable=False)
