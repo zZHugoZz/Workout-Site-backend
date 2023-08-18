@@ -81,7 +81,7 @@ class Workout(BaseModel):
     date: str
     created_at: datetime
     user_id: int
-    # exercises: list[WorkoutExercise]
+    exercises: list[WorkoutExercise]
 
 
 # -------------------- programs --------------------

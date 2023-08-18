@@ -6,13 +6,13 @@ from sqlalchemy import pool
 from alembic import context
 from app.models.base import Base
 
-# from app.models.users import User, Profile, Unit
-# from app.models.blacklisted_tokens import BlackListedToken
-# from app.models.bodyweights import BodyWeight
-# from app.models.exercises import Exercise
-# from app.models.programs import Program, ProgramDay, ProgramExercise
-# from app.models.progressions import Progression, Performance
-# from app.models.workouts import Workout, WorkoutExercise, WorkoutExerciseSet
+from app.models.users import User, Profile, Unit
+from app.models.blacklisted_tokens import BlackListedToken
+from app.models.bodyweights import BodyWeight
+from app.models.exercises import Exercise
+from app.models.programs import Program, ProgramDay, ProgramExercise
+from app.models.progressions import Progression, Performance
+from app.models.workouts import Workout, WorkoutExercise, WorkoutExerciseSet
 from app.config import settings
 
 # this is the Alembic Config object, which provides

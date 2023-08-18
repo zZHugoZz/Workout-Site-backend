@@ -1,9 +1,9 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
-from .base import BaseModel
+from .base import Base
 
 
-class BlackListedToken(BaseModel):
+class BlackListedToken(Base):
     __tablename__ = "blacklisted_tokens"
 
     token: Mapped[str] = mapped_column(String(300), nullable=False)

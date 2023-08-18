@@ -2,10 +2,10 @@ from typing import Self
 from sqlalchemy import String, select
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncSession
-from .base import BaseModel
+from .base import Base
 
 
-class Exercise(BaseModel):
+class Exercise(Base):
     __tablename__ = "exercises"
 
     name: Mapped[str] = mapped_column(String(100), nullable=False)

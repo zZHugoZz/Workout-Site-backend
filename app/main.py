@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .database import engine
+from .models import base
 from .routers import (
     users,
     exercises,
@@ -21,7 +22,7 @@ from .routers import (
 )
 
 
-# models.Base.metadata.create_all(bind=engine)
+# base.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 origins = ["*"]

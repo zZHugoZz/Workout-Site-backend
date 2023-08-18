@@ -5,10 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncAttrs
 
 
 class Base(AsyncAttrs, DeclarativeBase):
-    pass
-
-
-class BaseModel(Base):
     __abstract__ = True
 
     id: Mapped[int] = mapped_column(primary_key=True)
