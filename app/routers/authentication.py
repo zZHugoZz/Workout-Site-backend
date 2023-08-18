@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..models import users
 from ..database import get_db
-from .. import schemas
+from ..schemas import tokens_schemas
 from ..utils import encryption
 from .. import oauth2
 from ..dependencies import common_deps
@@ -14,7 +14,9 @@ from ..dependencies import common_deps
 router = APIRouter(tags=["Authentication"])
 
 
-@router.post("/login", status_code=status.HTTP_200_OK, response_model=schemas.Token)
+@router.post(
+    "/login", status_code=status.HTTP_200_OK, response_model=tokens_schemas.TokenSchema
+)
 async def login(
     credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: AsyncSession = Depends(get_db),

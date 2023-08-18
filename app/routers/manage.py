@@ -3,7 +3,7 @@ from ..models.workouts import Workout
 from ..models.programs import Program
 from ..models.progressions import Progression
 from ..models import units
-from .. import schemas
+from ..schemas import manage_data_schemas
 from ..utils import generic_operations
 from ..dependencies import common_deps
 
@@ -11,7 +11,11 @@ from ..dependencies import common_deps
 router = APIRouter(prefix="/manage", tags=["Manage"])
 
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=schemas.ManageData)
+@router.get(
+    "/",
+    status_code=status.HTTP_200_OK,
+    response_model=manage_data_schemas.ManageDataSchema,
+)
 async def get_manage_data(params: common_deps):
     workouts = await generic_operations.get_items(
         params["credentials"], params["db"], Workout

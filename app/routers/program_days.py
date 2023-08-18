@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status
-from .. import schemas
+from ..schemas import program_days_schemas
 from ..models import program_days
 from ..utils import generic_operations
 from ..dependencies import common_deps
@@ -9,9 +9,13 @@ router = APIRouter(prefix="/program_days", tags=["Program days"])
 
 
 @router.post(
-    "/", status_code=status.HTTP_201_CREATED, response_model=schemas.ProgramDay
+    "/",
+    status_code=status.HTTP_201_CREATED,
+    response_model=program_days_schemas.ProgramDaySchema,
 )
-async def create_program_day(program_day: schemas.ProgramDayIn, params: common_deps):
+async def create_program_day(
+    program_day: program_days_schemas.ProgramDayInSchema, params: common_deps
+):
     return await generic_operations.create_item(
         params["credentials"], params["db"], program_days.ProgramDay, program_day
     )
