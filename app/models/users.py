@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..utils import generic_operations, encryption
 from .base import Base
-from .. import schemas
+from ..schemas import users_schemas
 
 if TYPE_CHECKING:
     from .profiles import Profile
@@ -41,7 +41,9 @@ class User(Base):
         return user
 
     @classmethod
-    async def create_user(cls, user: schemas.UserIn, session: AsyncSession) -> Self:
+    async def create_user(
+        cls, user: users_schemas.UserInSchema, session: AsyncSession
+    ) -> Self:
         user.password = encryption.hash(user.password)
         created_user = cls(**user.model_dump())
         await generic_operations.add_to_db(created_user, session)
