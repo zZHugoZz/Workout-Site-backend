@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
 from .. import schemas
 from ..utils import generic_operations
-from .. import models
+from ..models import bodyweights
 from datetime import date
 from ..dependencies import common_deps
 
@@ -15,7 +15,11 @@ router = APIRouter(prefix="/bodyweights", tags=["Body weights"])
 async def create_bodyweight(bodyweight: schemas.BodyWeightIn, params: common_deps):
     current_date = {"date": str(date.today())}
     return await generic_operations.create_item(
-        params["credentials"], params["db"], models.BodyWeight, bodyweight, current_date
+        params["credentials"],
+        params["db"],
+        bodyweights.BodyWeight,
+        bodyweight,
+        current_date,
     )
 
 

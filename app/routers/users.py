@@ -10,8 +10,8 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=list[schemas.UserOut])
 async def get_users(db: AsyncSession = Depends(get_db)):
-    users = await users.User.get_users(db)
-    return users
+    retrieved_users = await users.User.get_users(db)
+    return retrieved_users
 
 
 @router.get("/{id}", status_code=status.HTTP_200_OK, response_model=schemas.UserOut)

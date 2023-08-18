@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
 from .. import schemas
 from ..utils import generic_operations
-from ..models import workouts
+from ..models import workout_exercise_sets
 from ..dependencies import common_deps
 
 
@@ -16,7 +16,7 @@ async def get_workout_exercise_set(id: int, params: common_deps):
         id,
         params["credentials"],
         params["db"],
-        workouts.WorkoutExerciseSet,
+        workout_exercise_sets.WorkoutExerciseSet,
         "Workout exercise set",
     )
 
@@ -30,7 +30,7 @@ async def create_workout_exercise_set(
     return await generic_operations.create_item(
         params["credentials"],
         params["db"],
-        workouts.WorkoutExerciseSet,
+        workout_exercise_sets.WorkoutExerciseSet,
         workout_exercise_set,
     )
 
@@ -43,6 +43,6 @@ async def delete_workout_exercise_set(id: int, params: common_deps):
         id,
         params["credentials"],
         params["db"],
-        workouts.WorkoutExerciseSet,
+        workout_exercise_sets.WorkoutExerciseSet,
         "Workout exercise set",
     )

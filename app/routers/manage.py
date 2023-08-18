@@ -2,7 +2,7 @@ from fastapi import status, APIRouter
 from ..models.workouts import Workout
 from ..models.programs import Program
 from ..models.progressions import Progression
-from ..models.users import Unit
+from ..models import units
 from .. import schemas
 from ..utils import generic_operations
 from ..dependencies import common_deps
@@ -22,7 +22,7 @@ async def get_manage_data(params: common_deps):
     progressions = await generic_operations.get_items(
         params["credentials"], params["db"], Progression
     )
-    unit = await Unit.get_unit(params["credentials"], params["db"])
+    unit = await units.Unit.get_unit(params["credentials"], params["db"])
     # workouts = (
     #     params["db"]
     #     .query(models.Workout)
