@@ -19,7 +19,7 @@ class Profile(Base):
     gender: Mapped[str] = mapped_column(String(100), nullable=True)
     profile_picture: Mapped[bytes] = mapped_column(BYTEA, nullable=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    user: Mapped[User] = relationship("User")
+    user = relationship("User")
 
     def __repr__(self) -> str:
         return f"Profile(id={self.id}, username={self.username}, email={self.email}, user_id={self.user_id}, user={self.user})"
