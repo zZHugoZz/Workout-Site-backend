@@ -1,4 +1,4 @@
-from typing import Self, TYPE_CHECKING
+from typing import Self
 from fastapi import HTTPException, status
 from sqlalchemy import String, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -6,10 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..utils import generic_operations, encryption
 from .base import Base
 from ..schemas import users_schemas
-
-if TYPE_CHECKING:
-    from .profiles import Profile
-    from .units import Unit
+from .profiles import Profile
+from .units import Unit
 
 
 class User(Base):
@@ -18,6 +16,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(100), nullable=False)
+    profile: Mapped[Profile] = relationship("Profile", back_populates="user")
 
     def __repr__(self) -> str:
         return f"User(id={self.id}, username={self.username} email={self.email})"

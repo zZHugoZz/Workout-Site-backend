@@ -1,5 +1,5 @@
 from sqlalchemy import Float, String, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
 from .users import User
 
@@ -12,7 +12,6 @@ class BodyWeight(Base):
     )
     weight: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    user: Mapped[User] = relationship()
 
     def __repr__(self) -> str:
         return f"BodyWeight(date={self.date}, weight={self.weight}, ...)"

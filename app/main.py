@@ -1,7 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .database import engine
-from .models import base
 from .routers import (
     users,
     exercises,
@@ -23,7 +21,7 @@ from .routers import (
 
 
 # base.Base.metadata.create_all(bind=engine)
-app = FastAPI()
+app = FastAPI(title="Workout site")
 
 origins = ["*"]
 
@@ -55,3 +53,8 @@ app.include_router(manage.router)
 app.include_router(bodyweights.router)
 
 app.include_router(websockets.router)
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)

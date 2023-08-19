@@ -17,9 +17,7 @@ class Program(Base):
     n_days: Mapped[int] = mapped_column(nullable=False, server_default="7")
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped[User] = relationship()
-    days: Mapped[list[ProgramDay]] = relationship(
-        "ProgramDay", back_populates="program"
-    )
+    days: Mapped[list[ProgramDay]] = relationship("ProgramDay")
 
     def __repr__(self) -> str:
         return f"Program(name={self.name}, description={self.description}, n_days={self.n_days}, ...)"

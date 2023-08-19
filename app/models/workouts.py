@@ -12,7 +12,7 @@ class Workout(Base):
         String(50), nullable=False, server_default="today"
     )
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    user: Mapped["User"] = relationship()
+    user: Mapped[User] = relationship("User")
     exercises: Mapped[list[WorkoutExercise]] = relationship("WorkoutExercise")
 
     def __repr__(self) -> str:

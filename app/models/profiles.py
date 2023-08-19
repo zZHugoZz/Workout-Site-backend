@@ -7,7 +7,9 @@ from sqlalchemy.dialects.postgresql import BYTEA
 from sqlalchemy.ext.asyncio import AsyncSession
 from .base import Base
 from .. import oauth2
-from .users import User
+
+if TYPE_CHECKING:
+    from .users import User
 
 
 class Profile(Base):
@@ -19,7 +21,7 @@ class Profile(Base):
     gender: Mapped[str] = mapped_column(String(100), nullable=True)
     profile_picture: Mapped[bytes] = mapped_column(BYTEA, nullable=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    user = relationship("User")
+    user: Mapped["User"] = relationship("User", back_populates="profile")
 
     def __repr__(self) -> str:
         return f"Profile(id={self.id}, username={self.username}, email={self.email}, user_id={self.user_id}, user={self.user})"

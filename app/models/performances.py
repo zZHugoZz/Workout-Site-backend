@@ -1,6 +1,7 @@
 from sqlalchemy import String, ForeignKey, Float
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
+from .progressions import Progression
 
 
 class Performance(Base):
