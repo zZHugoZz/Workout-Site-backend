@@ -45,7 +45,10 @@ class Profile(Base):
         new_values: dict,
     ) -> Self:
         user_id = oauth2.decode_token(credentials.credentials)
-        update_stmt = update(cls).where(cls.user_id == user_id).values(new_values)
+        update_stmt = (
+            update(cls).where(cls.user_id == user_id).values(new_values).returning(cls)
+        )
         exec = await session.execute(update_stmt)
-        updated_profile = exec.fetchone()
+        await session.commit()
+        updated_profile = exec.scalars().first()
         return updated_profile
