@@ -61,8 +61,8 @@ async def delete_item(
     model_name: str,
 ) -> Response:
     user_id = oauth2.decode_token(credentials.credentials)
-    query = select(model).where(model.id == id)
-    exec = await db.execute(query)
+    select_stmt = select(model).where(model.id == id)
+    exec = await db.execute(select_stmt)
     item_to_delete = exec.scalars().first()
     if item_to_delete is None:
         raise NOT_FOUND_EXCEPTION(model_name, id)
