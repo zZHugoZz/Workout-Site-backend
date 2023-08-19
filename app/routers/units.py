@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
 from ..schemas import units_schemas
 from ..models import units
-from ..dependencies import common_deps
+from ..dependencies import common_deps, Dependencies
 
 
 router = APIRouter(prefix="/units", tags=["Units"])
@@ -11,7 +11,9 @@ router = APIRouter(prefix="/units", tags=["Units"])
     "/", status_code=status.HTTP_200_OK, response_model=units_schemas.UnitSchema
 )
 async def get_unit(params: common_deps):
-    return await units.Unit.get_unit(params["credentials"], params["db"])
+    return await units.Unit.get_unit(
+        params[Dependencies.CREDENTIALS], params[Dependencies.DB]
+    )
 
 
 @router.put(
@@ -19,5 +21,5 @@ async def get_unit(params: common_deps):
 )
 async def update_unit(unit: units_schemas.UnitInSchema, params: common_deps):
     return await units.Unit.update_unit(
-        params["credentials"], params["db"], unit.model_dump()
+        params[Dependencies.CREDENTIALS], params[Dependencies.DB], unit.model_dump()
     )

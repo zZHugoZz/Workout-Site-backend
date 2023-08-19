@@ -3,7 +3,7 @@ from ..schemas import bodyweights_schemas
 from ..utils import generic_operations
 from ..models import bodyweights
 from datetime import date
-from ..dependencies import common_deps
+from ..dependencies import common_deps, Dependencies
 
 
 router = APIRouter(prefix="/bodyweights", tags=["Body weights"])
@@ -19,8 +19,8 @@ async def create_bodyweight(
 ):
     current_date = {"date": str(date.today())}
     return await generic_operations.create_item(
-        params["credentials"],
-        params["db"],
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
         bodyweights.BodyWeight,
         bodyweight,
         current_date,
@@ -34,5 +34,7 @@ async def create_bodyweight(
 )
 async def get_bodyweights(params: common_deps):
     return await generic_operations.get_items(
-        params["credentials"], params["db"], bodyweights.BodyWeight
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        bodyweights.BodyWeight,
     )

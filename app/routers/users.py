@@ -14,16 +14,14 @@ router = APIRouter(prefix="/users", tags=["Users"])
     response_model=list[users_schemas.UserOutSchema],
 )
 async def get_users(db: AsyncSession = Depends(get_db)):
-    retrieved_users = await users.User.get_users(db)
-    return retrieved_users
+    return await users.User.get_users(db)
 
 
 @router.get(
     "/{id}", status_code=status.HTTP_200_OK, response_model=users_schemas.UserOutSchema
 )
 async def get_user(id: int, db: AsyncSession = Depends(get_db)):
-    user = await users.User.get_user(db, id)
-    return user
+    return await users.User.get_user(db, id)
 
 
 @router.post(
@@ -32,5 +30,4 @@ async def get_user(id: int, db: AsyncSession = Depends(get_db)):
 async def create_user(
     user: users_schemas.UserInSchema, db: AsyncSession = Depends(get_db)
 ):
-    created_user = await users.User.create_user(user, db)
-    return created_user
+    return await users.User.create_user(user, db)

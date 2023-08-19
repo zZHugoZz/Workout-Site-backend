@@ -2,7 +2,7 @@ from fastapi import APIRouter, status
 from ..schemas import performances_schemas
 from ..utils import generic_operations
 from ..models import performances
-from ..dependencies import common_deps
+from ..dependencies import common_deps, Dependencies
 
 
 router = APIRouter(prefix="/performances", tags=["Performances"])
@@ -17,12 +17,19 @@ async def create_performance(
     performance: performances_schemas.PerformanceInSchema, params: common_deps
 ):
     return await generic_operations.create_item(
-        params["credentials"], params["db"], performances.Performance, performance
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        performances.Performance,
+        performance,
     )
 
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
 async def delete_performance(id: int, params: common_deps):
     return await generic_operations.delete_item(
-        id, params["credentials"], params["db"], performances.Performance, "Performance"
+        id,
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        performances.Performance,
+        "Performance",
     )

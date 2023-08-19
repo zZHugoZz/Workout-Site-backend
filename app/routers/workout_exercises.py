@@ -2,7 +2,7 @@ from fastapi import status, APIRouter
 from ..models import workout_exercises
 from ..schemas import workout_exercises_schemas
 from ..utils import generic_operations
-from ..dependencies import common_deps
+from ..dependencies import common_deps, Dependencies
 
 
 router = APIRouter(prefix="/workout_exercises", tags=["Workout Exercises"])
@@ -15,7 +15,9 @@ router = APIRouter(prefix="/workout_exercises", tags=["Workout Exercises"])
 )
 async def get_workout_exercises(params: common_deps):
     return await generic_operations.get_items(
-        params["credentials"], params["db"], workout_exercises.WorkoutExercise
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        workout_exercises.WorkoutExercise,
     )
 
 
@@ -27,8 +29,8 @@ async def get_workout_exercises(params: common_deps):
 async def get_workout_exercise(id: int, params: common_deps):
     return await generic_operations.get_item(
         id,
-        params["credentials"],
-        params["db"],
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
         workout_exercises.WorkoutExercise,
         "Workout exercise",
     )
@@ -43,7 +45,10 @@ async def create_workout_exercise(
     exercise: workout_exercises_schemas.WorkoutExerciseInSchema, params: common_deps
 ):
     return await generic_operations.create_item(
-        params["credentials"], params["db"], workout_exercises.WorkoutExercise, exercise
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        workout_exercises.WorkoutExercise,
+        exercise,
     )
 
 
@@ -51,8 +56,8 @@ async def create_workout_exercise(
 async def delete_workout_exercise(id: int, params: common_deps):
     return await generic_operations.delete_item(
         id,
-        params["credentials"],
-        params["db"],
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
         workout_exercises.WorkoutExercise,
         "Workout exercise",
     )

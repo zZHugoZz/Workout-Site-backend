@@ -2,7 +2,7 @@ from fastapi import APIRouter, status
 from ..schemas import progressions_schemas
 from ..models import progressions
 from ..utils import generic_operations
-from ..dependencies import common_deps
+from ..dependencies import common_deps, Dependencies
 
 
 router = APIRouter(prefix="/progressions", tags=["Progressions"])
@@ -15,7 +15,9 @@ router = APIRouter(prefix="/progressions", tags=["Progressions"])
 )
 async def get_progressions(params: common_deps):
     return await generic_operations.get_items(
-        params["credentials"], params["db"], progressions.Progression
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        progressions.Progression,
     )
 
 
@@ -26,7 +28,11 @@ async def get_progressions(params: common_deps):
 )
 async def get_progression(id: int, params: common_deps):
     return await generic_operations.get_item(
-        id, params["credentials"], params["db"], progressions.Progression, "Progression"
+        id,
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        progressions.Progression,
+        "Progression",
     )
 
 
@@ -39,12 +45,19 @@ async def create_progression(
     progression: progressions_schemas.ProgresionInSchema, params: common_deps
 ):
     return await generic_operations.create_item(
-        params["credentials"], params["db"], progressions.Progression, progression
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        progressions.Progression,
+        progression,
     )
 
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
 async def delete_progression(id: int, params: common_deps):
     return await generic_operations.delete_item(
-        id, params["credentials"], params["db"], progressions.Progression, "Progression"
+        id,
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        progressions.Progression,
+        "Progression",
     )

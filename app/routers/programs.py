@@ -2,7 +2,7 @@ from fastapi import APIRouter, status
 from ..schemas import programs_schemas
 from ..models import programs
 from ..utils import generic_operations
-from ..dependencies import common_deps
+from ..dependencies import common_deps, Dependencies
 
 
 router = APIRouter(prefix="/programs", tags=["Programs"])
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/programs", tags=["Programs"])
 )
 async def get_programs(params: common_deps):
     return await generic_operations.get_items(
-        params["credentials"], params["db"], programs.Program
+        params[Dependencies.CREDENTIALS], params[Dependencies.DB], programs.Program
     )
 
 
@@ -26,7 +26,11 @@ async def get_programs(params: common_deps):
 )
 async def get_program(id: int, params: common_deps):
     return await generic_operations.get_item(
-        id, params["credentials"], params["db"], programs.Program, "Program"
+        id,
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        programs.Program,
+        "Program",
     )
 
 
@@ -39,12 +43,19 @@ async def create_program(
     program: programs_schemas.ProgramInSchema, params: common_deps
 ):
     return await generic_operations.create_item(
-        params["credentials"], params["db"], programs.Program, program
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        programs.Program,
+        program,
     )
 
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
 async def delete_program(id: int, params: common_deps):
     return await generic_operations.delete_item(
-        id, params["credentials"], params["db"], programs.Program, "Program"
+        id,
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        programs.Program,
+        "Program",
     )

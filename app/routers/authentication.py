@@ -8,7 +8,7 @@ from ..database import get_db
 from ..schemas import tokens_schemas
 from ..utils import encryption
 from .. import oauth2
-from ..dependencies import common_deps
+from ..dependencies import common_deps, Dependencies
 
 
 router = APIRouter(tags=["Authentication"])
@@ -42,6 +42,6 @@ async def login(
 
 @router.get("/refresh_token")
 async def refresh(params: common_deps):
-    token = params["credentials"].credentials
+    token = params[Dependencies.CREDENTIALS].credentials
     print("token: ", token)
-    return await oauth2.get_new_access_token(token, params["db"])
+    return await oauth2.get_new_access_token(token, params[Dependencies.DB])
