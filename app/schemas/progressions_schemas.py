@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from .performances_schemas import PerformanceSchema
 
 
@@ -13,3 +13,5 @@ class ProgressionSchema(ProgresionInSchema):
     created_at: datetime
     user_id: int
     performances: list[PerformanceSchema]
+
+    model_config = ConfigDict(from_attributes=True)

@@ -11,7 +11,8 @@ router = APIRouter(prefix="/profiles", tags=["Profiles"])
     "/", status_code=status.HTTP_200_OK, response_model=profiles_schemas.ProfileSchema
 )
 async def get_profile(params: common_deps):
-    return await profiles.Profile.get_profile(params["credentials"], params["db"])
+    profile = await profiles.Profile.get_profile(params["credentials"], params["db"])
+    return profile
 
 
 @router.put(

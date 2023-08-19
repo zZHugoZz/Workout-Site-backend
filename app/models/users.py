@@ -1,7 +1,7 @@
 from typing import Self
 from fastapi import HTTPException, status
 from sqlalchemy import String, select
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..utils import generic_operations, encryption
 from .base import Base
@@ -16,10 +16,12 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(100), nullable=False)
-    profile: Mapped[Profile] = relationship("Profile", back_populates="user")
+    profile: Mapped[Profile] = relationship(
+        "Profile", back_populates="user", lazy="selectin"
+    )
 
     def __repr__(self) -> str:
-        return f"User(id={self.id}, username={self.username} email={self.email})"
+        return f"User(id={self.id}, username={self.username} email={self.email} profile={self.profile})"
 
     @classmethod
     async def get_users(cls, session: AsyncSession) -> list[Self]:
@@ -29,8 +31,8 @@ class User(Base):
 
     @classmethod
     async def get_user(cls, session: AsyncSession, id: int) -> Self:
-        query = select(cls).where(cls.id == id)
-        exec = await session.execute(query)
+        select_stmt = select(cls).where(cls.id == id)
+        exec = await session.execute(select_stmt)
         user = exec.scalars().first()
         if user is None:
             raise HTTPException(

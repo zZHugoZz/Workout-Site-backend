@@ -19,7 +19,7 @@ class Unit(Base):
     @classmethod
     async def get_unit(
         cls, credentials: HTTPAuthorizationCredentials, session: AsyncSession
-    ) -> Self:
+    ) -> "Unit":
         user_id = oauth2.decode_token(credentials.credentials)
         select_stmt = select(cls).where(cls.user_id == user_id)
         exec = await session.execute(select_stmt)
@@ -32,9 +32,12 @@ class Unit(Base):
         credentials: HTTPAuthorizationCredentials,
         session: AsyncSession,
         new_values: dict,
-    ) -> Self:
+    ) -> "Unit":
         user_id = oauth2.decode_token(credentials.credentials)
-        update_stmt = update(cls).where(cls.user_id == user_id).values(new_values)
+        update_stmt = (
+            update(cls).where(cls.user_id == user_id).values(new_values).returning(cls)
+        )
         exec = await session.execute(update_stmt)
-        updated_unit = exec.fetchone()
+        await session.commit()
+        updated_unit = exec.scalars().first()
         return updated_unit

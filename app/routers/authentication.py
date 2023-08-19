@@ -43,4 +43,5 @@ async def login(
 @router.get("/refresh_token")
 async def refresh(params: common_deps):
     token = params["credentials"].credentials
+    print("token: ", token)
     return await oauth2.get_new_access_token(token, params["db"])

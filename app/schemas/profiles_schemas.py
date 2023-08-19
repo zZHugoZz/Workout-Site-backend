@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, EmailStr
 from .users_schemas import UserOutSchema
 
 
@@ -9,5 +9,8 @@ class ProfileInSchema(BaseModel):
 
 
 class ProfileSchema(ProfileInSchema):
+    username: str
+    email: EmailStr
     user_id: int
-    user: UserOutSchema
+
+    model_config = ConfigDict(from_attributes=True)

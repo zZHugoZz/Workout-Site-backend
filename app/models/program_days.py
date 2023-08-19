@@ -1,7 +1,10 @@
+from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
-from .program_exercises import ProgramExercise
+
+if TYPE_CHECKING:
+    from .program_exercises import ProgramExercise
 
 
 class ProgramDay(Base):
@@ -10,9 +13,7 @@ class ProgramDay(Base):
     program_id: Mapped[int] = mapped_column(
         ForeignKey("programs.id", ondelete="CASCADE")
     )
-    exercises: Mapped[list[ProgramExercise]] = relationship(
-        "ProgramExercise", back_populates="program_day"
-    )
+    exercises: Mapped[list["ProgramExercise"]] = relationship("ProgramExercise")
     user_id: Mapped[int] = mapped_column(nullable=False)
 
     def __repr__(self) -> str:

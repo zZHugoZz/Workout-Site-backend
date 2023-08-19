@@ -12,7 +12,10 @@ class WorkoutExercise(Base):
     workout_id: Mapped[int] = mapped_column(
         ForeignKey("workouts.id", ondelete="CASCADE")
     )
-    sets: Mapped[list[WorkoutExerciseSet]] = relationship("WorkoutExerciseSet")
+    sets: Mapped[list[WorkoutExerciseSet]] = relationship(
+        "WorkoutExerciseSet", lazy="selectin"
+    )
+    user_id: Mapped[int] = mapped_column(nullable=False)
 
     def __repr__(self) -> str:
         return (
