@@ -1,7 +1,7 @@
 from typing import Self
 from fastapi import HTTPException, status
 from sqlalchemy import String, select
-from sqlalchemy.orm import Mapped, mapped_column, relationship, selectinload
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..utils import generic_operations, encryption
 from .base import Base
@@ -16,12 +16,9 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(100), nullable=False)
-    profile: Mapped[Profile] = relationship(
-        "Profile", back_populates="user", lazy="selectin"
-    )
 
     def __repr__(self) -> str:
-        return f"User(id={self.id}, username={self.username} email={self.email} profile={self.profile})"
+        return f"User(id={self.id}, username={self.username} email={self.email})"
 
     @classmethod
     async def get_users(cls, session: AsyncSession) -> list[Self]:
