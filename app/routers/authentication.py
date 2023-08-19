@@ -40,7 +40,7 @@ async def login(
     return {"access_token": access_token, "refresh_token": refresh_token}
 
 
-@router.get("/refresh_token")
+@router.post("/refresh_token")
 async def refresh(params: common_deps):
     token = params[Dependencies.CREDENTIALS].credentials
     print("token: ", token)
