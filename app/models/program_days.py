@@ -13,7 +13,9 @@ class ProgramDay(Base):
     program_id: Mapped[int] = mapped_column(
         ForeignKey("programs.id", ondelete="CASCADE")
     )
-    exercises: Mapped[list["ProgramExercise"]] = relationship("ProgramExercise")
+    exercises: Mapped[list["ProgramExercise"]] = relationship(
+        "ProgramExercise", lazy="selectin"
+    )
     user_id: Mapped[int] = mapped_column(nullable=False)
 
     def __repr__(self) -> str:
