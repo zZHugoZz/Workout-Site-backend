@@ -1,6 +1,7 @@
 from typing import Sequence
 from fastapi import Response, status
 from fastapi.security import HTTPAuthorizationCredentials
+from pydantic import BaseModel
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from .. import oauth2
@@ -72,35 +73,24 @@ async def delete_item(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-""" Take a look later """
-
-
 async def update_item(
     id: int,
-    updated_item,
+    updated_item: BaseModel,
     credentials: HTTPAuthorizationCredentials,
     db: AsyncSession,
     model,
     model_name: str,
 ) -> any:
     user_id = oauth2.decode_token(credentials.credentials)
-    # query = db.query(model).filter(model.id == id)
-    # if query.first() is None:
-    #     raise NOT_FOUND_EXCEPTION(model_name, id)
-    # if query.first().user_id != user_id:
-    #     raise FORBIDDEN_EXCEPTION
-    # query.update(updated_item.model_dump())
-    # db.commit()
-    # return query.first()
-    query = select(model).where(model.id == id)
-    exec = await db.execute(query)
+    select_stmt = select(model).where(model.id == id)
+    exec = await db.execute(select_stmt)
     item_to_update = exec.scalars().first()
     if item_to_update is None:
         raise NOT_FOUND_EXCEPTION(model_name, id)
     if item_to_update.user_id != user_id:
         raise FORBIDDEN_EXCEPTION
-    query = update(model).values(updated_item.model_dump())
-    await db.execute(query)
+    update_stmt = update(model).values(updated_item.model_dump())
+    await db.execute(update_stmt)
     await db.commit()
     return model
 
