@@ -53,13 +53,27 @@ class Workout(Base):
     @classmethod
     async def get_workout_by_current_date(
         cls, credentials: HTTPAuthorizationCredentials, session: AsyncSession
-    ) -> Self | None:
+    ) -> Self | Response:
         credentials_id = oauth2.decode_token(credentials.credentials)
         select_stmt = select(cls).where(cls.date == str(datetime.date.today()))
-        exec = await session.execute(select_stmt)
-        workout = exec.scalars().first()
-        if workout is None:
-            return Response(status_code=status.HTTP_200_OK)
-        if workout.user_id != credentials_id:
-            raise FORBIDDEN_EXCEPTION
-        return workout
+        return await execute(select_stmt, credentials_id, session)
+
+    @classmethod
+    async def get_workout_by_date(
+        cls, date: str, credentials: HTTPAuthorizationCredentials, session: AsyncSession
+    ) -> Self | Response:
+        credentials_id = oauth2.decode_token(credentials.credentials)
+        select_stmt = select(cls).where(cls.date == date)
+        return await execute(select_stmt, credentials_id, session)
+
+
+async def execute(
+    select_stmt: any, credentials_id: int, session: AsyncSession
+) -> Self | Response:
+    exec = await session.execute(select_stmt)
+    workout = exec.scalars().first()
+    if workout is None:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    if workout.user_id != credentials_id:
+        raise FORBIDDEN_EXCEPTION
+    return workout

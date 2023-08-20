@@ -45,6 +45,18 @@ async def get_workouts_by_month(
 
 
 @router.get(
+    "/workout_by_date/",
+    status_code=status.HTTP_200_OK,
+    response_model=workouts_schemas.WorkoutSchema | None,
+)
+async def get_workout_by_date(date: Annotated[str, Query()], params: common_deps):
+    return await workouts.Workout.get_workout_by_date(
+        date, params[Dependencies.CREDENTIALS], params[Dependencies.DB]
+    )
+
+
+# Not really necessary, mostly for testing, already used in manage.py
+@router.get(
     "/workout_by_current_date/",
     status_code=status.HTTP_200_OK,
     response_model=workouts_schemas.WorkoutSchema | None,
