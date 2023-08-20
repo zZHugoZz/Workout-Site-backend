@@ -36,11 +36,13 @@ async def get_workout(id: int, params: common_deps):
     )
 
 
-@router.get("/", status_code=status.HTTP_200_OK)
-async def get_workout_by_month(
-    month: Annotated[int, Query()], year: Annotated[int, Query()]
-) -> list[int]:
-    pass
+@router.get("/filter/", status_code=status.HTTP_200_OK)
+async def get_workouts_by_month(
+    month: Annotated[int, Query()], year: Annotated[int, Query()], params: common_deps
+):
+    return await workouts.Workout.get_workout_by_month(
+        month, year, params[Dependencies.CREDENTIALS], params[Dependencies.DB]
+    )
 
 
 @router.post(
