@@ -2,7 +2,6 @@ from typing import Annotated
 from fastapi import Query, status, APIRouter
 from ..models import workouts
 from ..schemas import workouts_schemas
-from datetime import date
 from ..utils import generic_operations
 from ..dependencies import common_deps, Dependencies
 
@@ -40,8 +39,19 @@ async def get_workout(id: int, params: common_deps):
 async def get_workouts_by_month(
     month: Annotated[int, Query()], year: Annotated[int, Query()], params: common_deps
 ):
-    return await workouts.Workout.get_workout_by_month(
+    return await workouts.Workout.get_workouts_by_month(
         month, year, params[Dependencies.CREDENTIALS], params[Dependencies.DB]
+    )
+
+
+@router.get(
+    "/workout_by_current_date/",
+    status_code=status.HTTP_200_OK,
+    response_model=workouts_schemas.WorkoutSchema | None,
+)
+async def get_workout_by_current_date(params: common_deps):
+    return await workouts.Workout.get_workout_by_current_date(
+        params[Dependencies.CREDENTIALS], params[Dependencies.DB]
     )
 
 

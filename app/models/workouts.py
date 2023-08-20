@@ -1,7 +1,12 @@
+from typing import Self, Sequence
+import datetime
+from fastapi import Response, status
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import String, ForeignKey, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.utils.generic_exceptions import FORBIDDEN_EXCEPTION
 from .. import oauth2
 from .base import Base
 from .users import User
@@ -27,13 +32,13 @@ class Workout(Base):
         return f"Workout(id={self.id}, date={self.date}, ...)"
 
     @classmethod
-    async def get_workout_by_month(
+    async def get_workouts_by_month(
         cls,
         month: int,
         year: int,
         credentials: HTTPAuthorizationCredentials,
         session: AsyncSession,
-    ):
+    ) -> Sequence[int] | None:
         credentials_id = oauth2.decode_token(credentials.credentials)
         select_stmt = (
             select(cls.day)
@@ -41,7 +46,20 @@ class Workout(Base):
             .where(cls.month == month)
             .where(cls.year == year)
         )
-        print("select: ", select_stmt)
         exec = await session.execute(select_stmt)
         days = exec.scalars().all()
         return days
+
+    @classmethod
+    async def get_workout_by_current_date(
+        cls, credentials: HTTPAuthorizationCredentials, session: AsyncSession
+    ) -> Self | None:
+        credentials_id = oauth2.decode_token(credentials.credentials)
+        select_stmt = select(cls).where(cls.date == str(datetime.date.today()))
+        exec = await session.execute(select_stmt)
+        workout = exec.scalars().first()
+        if workout is None:
+            return Response(status_code=status.HTTP_200_OK)
+        if workout.user_id != credentials_id:
+            raise FORBIDDEN_EXCEPTION
+        return workout
