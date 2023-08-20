@@ -1,5 +1,3 @@
-from typing import Self
-import datetime
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -8,7 +6,6 @@ from .. import oauth2
 from .base import Base
 from .users import User
 from .workout_exercises import WorkoutExercise
-from ..utils import generic_operations
 
 
 class Workout(Base):
@@ -30,18 +27,11 @@ class Workout(Base):
         return f"Workout(id={self.id}, date={self.date}, ...)"
 
     @classmethod
-    async def create_workout(
-        cls, credentials: HTTPAuthorizationCredentials, session: AsyncSession
-    ) -> Self:
+    async def get_workout_by_month(
+        cls,
+        month: int,
+        year: int,
+        credentials: HTTPAuthorizationCredentials,
+        session: AsyncSession,
+    ):
         credentials_id = oauth2.decode_token(credentials.credentials)
-        current_date = datetime.date.today()
-        day, month, year = current_date.day, current_date.month, current_date.year
-        created_workout = cls(
-            date=str(current_date),
-            day=day,
-            month=month,
-            year=year,
-            user_id=credentials_id,
-        )
-        await generic_operations.add_to_db(created_workout, session)
-        return created_workout
