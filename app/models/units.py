@@ -1,4 +1,3 @@
-from typing import Self
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import String, ForeignKey, select, update
 from sqlalchemy.orm import Mapped, mapped_column

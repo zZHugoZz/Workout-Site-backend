@@ -57,7 +57,7 @@ def encode_refresh_token(user_id: int) -> bytes:
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
-async def get_new_access_token(refresh_token: any, db: AsyncSession) -> dict:
+async def get_new_access_token(refresh_token: any, session: AsyncSession) -> dict:
     try:
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         if payload["scope"] != "refresh_token":
@@ -68,7 +68,7 @@ async def get_new_access_token(refresh_token: any, db: AsyncSession) -> dict:
         select_stmt = select(blt.BlackListedToken).where(
             blt.BlackListedToken.token == refresh_token
         )
-        exec = await db.execute(select_stmt)
+        exec = await session.execute(select_stmt)
         blacklisted_token = exec.scalars().first()
         if blacklisted_token is not None:
             raise HTTPException(
@@ -78,8 +78,8 @@ async def get_new_access_token(refresh_token: any, db: AsyncSession) -> dict:
         new_token = encode_token(user_id)
         new_refresh_token = encode_refresh_token(user_id)
         used_token = blt.BlackListedToken(token=refresh_token)
-        db.add(used_token)
-        await db.commit()
+        session.add(used_token)
+        await session.commit()
         return {"access_token": new_token, "refresh_token": new_refresh_token}
 
     except jwt.ExpiredSignatureError:

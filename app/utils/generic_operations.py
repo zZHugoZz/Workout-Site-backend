@@ -2,7 +2,7 @@ from typing import Sequence
 from fastapi import Response, status
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel
-from sqlalchemy import select, update
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from .. import oauth2
 from .generic_exceptions import NOT_FOUND_EXCEPTION, FORBIDDEN_EXCEPTION
@@ -68,7 +68,8 @@ async def delete_item(
         raise NOT_FOUND_EXCEPTION(model_name, id)
     if item_to_delete.user_id != user_id:
         raise FORBIDDEN_EXCEPTION
-    await session.delete(item_to_delete)
+    delete_stmt = delete(model).where(model.id == id)
+    await session.execute(delete_stmt)
     await session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
