@@ -15,5 +15,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int
     refresh_token_expire_minutes: int
 
+    spoonacular_api_key: str
+
 
 settings = Settings()
