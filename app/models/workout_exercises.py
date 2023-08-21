@@ -1,5 +1,5 @@
 from sqlalchemy import String, ForeignKey, select, event, update, Connection
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, Mapper
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 from .base import Base
 from .workout_exercise_sets import WorkoutExerciseSet
@@ -33,7 +33,7 @@ class WorkoutExercise(Base):
     @staticmethod
     @event.listens_for(WorkoutExerciseSet, "after_insert")
     def increment_n_sets(
-        mapper, connection: Connection, target: WorkoutExerciseSet
+        mapper: Mapper, connection: Connection, target: WorkoutExerciseSet
     ) -> None:
         update_stmt = (
             update(WorkoutExercise)
@@ -46,13 +46,13 @@ class WorkoutExercise(Base):
     @staticmethod
     @event.listens_for(WorkoutExerciseSet, "after_delete")
     def decrement_n_sets(
-        mapper, connection: Connection, target: WorkoutExerciseSet
+        mapper: Mapper, connection: Connection, target: WorkoutExerciseSet
     ) -> None:
-        # update_stmt = (
-        #     update(WorkoutExercise)
-        #     .where(WorkoutExercise.id == target.workout_exercise_id)
-        #     .values({"n_sets": WorkoutExercise.n_sets - 1})
-        # )
-        # print("stmt: ", update_stmt)
-        # connection.execute(update_stmt)
-        print("deleted")
+        update_stmt = (
+            update(WorkoutExercise)
+            .where(WorkoutExercise.id == target.workout_exercise_id)
+            .values({"n_sets": WorkoutExercise.n_sets - 1})
+        )
+        print("stmt: ", update_stmt)
+        connection.execute(update_stmt)
+        print("mapper: ", type(mapper))
