@@ -23,13 +23,6 @@ class WorkoutExercise(Base):
             f"WorkoutExercise(id={self.id}, name={self.name}, nsets={self.n_sets}, ...)"
         )
 
-    @classmethod
-    async def get_n_sets(cls, id: int, session: AsyncSession) -> int:
-        s = select(cls).where(cls.id == id)
-        exec = await session.execute(s)
-        i = exec.scalars().first()
-        return len(i.sets)
-
     @staticmethod
     @event.listens_for(WorkoutExerciseSet, "after_insert")
     def increment_n_sets(
