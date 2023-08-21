@@ -6,8 +6,7 @@ from .units_schemas import UnitSchema
 
 
 class ManageDataSchema(BaseModel):
-    workouts: list[WorkoutSchema]
-    todays_workout: WorkoutSchema
+    todays_workout: WorkoutSchema | None
     programs: list[ProgramSchema]
     progressions: list[ProgressionSchema]
     unit: UnitSchema

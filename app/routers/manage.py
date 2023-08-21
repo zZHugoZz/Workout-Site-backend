@@ -17,9 +17,6 @@ router = APIRouter(prefix="/manage", tags=["Manage"])
     response_model=manage_data_schemas.ManageDataSchema,
 )
 async def get_manage_data(params: common_deps):
-    workouts_list = await generic_operations.get_items(
-        params[Dependencies.CREDENTIALS], params[Dependencies.DB], Workout
-    )
     todays_workout = await workouts.Workout.get_workout_by_current_date(
         params[Dependencies.CREDENTIALS], params[Dependencies.DB]
     )
@@ -33,7 +30,6 @@ async def get_manage_data(params: common_deps):
         params[Dependencies.CREDENTIALS], params[Dependencies.DB]
     )
     return {
-        "workouts": workouts_list,
         "todays_workout": todays_workout,
         "programs": programs,
         "progressions": progressions,
