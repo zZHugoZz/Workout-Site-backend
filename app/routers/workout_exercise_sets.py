@@ -43,7 +43,6 @@ async def create_workout_exercise_set(
 @router.delete(
     "/{id}",
     status_code=status.HTTP_200_OK,
-    response_model=workout_exercise_sets_schemas.WorkoutExerciseSetSchema,
 )
 async def delete_workout_exercise_set(id: int, params: common_deps):
     return await generic_operations.delete_item(
