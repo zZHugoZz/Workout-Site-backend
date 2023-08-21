@@ -48,10 +48,11 @@ class WorkoutExercise(Base):
     def decrement_n_sets(
         mapper, connection: Connection, target: WorkoutExerciseSet
     ) -> None:
-        update_stmt = (
-            update(WorkoutExercise)
-            .where(WorkoutExercise.id == target.workout_exercise_id)
-            .values({"n_sets": WorkoutExercise.n_sets - 1})
-        )
-        print("stmt: ", update_stmt)
-        connection.execute(update_stmt)
+        # update_stmt = (
+        #     update(WorkoutExercise)
+        #     .where(WorkoutExercise.id == target.workout_exercise_id)
+        #     .values({"n_sets": WorkoutExercise.n_sets - 1})
+        # )
+        # print("stmt: ", update_stmt)
+        # connection.execute(update_stmt)
+        print("deleted")

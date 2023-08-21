@@ -2,7 +2,7 @@ from typing import Sequence
 from fastapi import Response, status
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel
-from sqlalchemy import delete, select, update
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from .. import oauth2
 from .generic_exceptions import NOT_FOUND_EXCEPTION, FORBIDDEN_EXCEPTION
@@ -29,6 +29,7 @@ async def get_item(
     query = select(model).where(model.id == id)
     exec = await session.execute(query)
     item = exec.scalars().first()
+
     if item is None:
         raise NOT_FOUND_EXCEPTION(model_name, id)
     if item.user_id != user_id:
@@ -64,12 +65,13 @@ async def delete_item(
     select_stmt = select(model).where(model.id == id)
     exec = await session.execute(select_stmt)
     item_to_delete = exec.scalars().first()
+
     if item_to_delete is None:
         raise NOT_FOUND_EXCEPTION(model_name, id)
     if item_to_delete.user_id != user_id:
         raise FORBIDDEN_EXCEPTION
-    delete_stmt = delete(model).where(model.id == id)
-    await session.execute(delete_stmt)
+
+    await session.delete(item_to_delete)
     await session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -86,10 +88,12 @@ async def update_item(
     select_stmt = select(model).where(model.id == id)
     exec = await session.execute(select_stmt)
     item_to_update = exec.scalars().first()
+
     if item_to_update is None:
         raise NOT_FOUND_EXCEPTION(model_name, id)
     if item_to_update.user_id != user_id:
         raise FORBIDDEN_EXCEPTION
+
     update_stmt = update(model).values(updated_item.model_dump()).returning(model)
     exec = await session.execute(update_stmt)
     await session.commit()
