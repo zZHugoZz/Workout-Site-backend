@@ -1,11 +1,11 @@
 from typing import Self, Sequence
 import datetime
+from fastapi import Response
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import String, ForeignKey, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.utils.generic_exceptions import FORBIDDEN_EXCEPTION
+from ..utils import generic_exceptions
 from .. import oauth2
 from .base import Base
 from .users import User
@@ -24,7 +24,7 @@ class Workout(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped[User] = relationship("User")
     exercises: Mapped[list[WorkoutExercise]] = relationship(
-        "WorkoutExercise", lazy="selectin"
+        "WorkoutExercise", lazy="selectin", cascade="all, delete"
     )
 
     def __repr__(self) -> str:
@@ -65,6 +65,25 @@ class Workout(Base):
         select_stmt = select(cls).where(cls.date == date)
         return await execute(select_stmt, credentials_id, session)
 
+    @classmethod
+    async def delete_workout(
+        cls,
+        workout_id: int,
+        credentials: HTTPAuthorizationCredentials,
+        session: AsyncSession,
+    ) -> dict[str, str | int]:
+        user_id = oauth2.decode_token(credentials.credentials)
+        select_stmt = select(cls).where(cls.id == workout_id)
+        exec = await session.execute(select_stmt)
+        workout = exec.scalars().first()
+        if workout is None:
+            raise generic_exceptions.NOT_FOUND_EXCEPTION("Workout", workout_id)
+        if workout.user_id != user_id:
+            raise generic_exceptions.FORBIDDEN_EXCEPTION
+        await session.delete(workout)
+        await session.commit()
+        return {"date": workout.date, "day": workout.day}
+
 
 async def execute(
     select_stmt: any, credentials_id: int, session: AsyncSession
@@ -74,5 +93,5 @@ async def execute(
     if workout is None:
         return None
     if workout.user_id != credentials_id:
-        raise FORBIDDEN_EXCEPTION
+        raise generic_exceptions.FORBIDDEN_EXCEPTION
     return workout

@@ -85,10 +85,13 @@ async def create_workout(
 
 @router.delete("/{id}", status_code=status.HTTP_200_OK)
 async def delete_workout(id: int, params: common_deps):
-    return await generic_operations.delete_item(
-        id,
-        params[Dependencies.CREDENTIALS],
-        params[Dependencies.DB],
-        workouts.Workout,
-        "Workout",
+    # return await generic_operations.delete_item(
+    #     id,
+    #     params[Dependencies.CREDENTIALS],
+    #     params[Dependencies.DB],
+    #     workouts.Workout,
+    #     "Workout",
+    # )
+    return await workouts.Workout.delete_workout(
+        id, params[Dependencies.CREDENTIALS], params[Dependencies.DB]
     )

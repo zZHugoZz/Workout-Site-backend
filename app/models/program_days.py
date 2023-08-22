@@ -14,7 +14,7 @@ class ProgramDay(Base):
         ForeignKey("programs.id", ondelete="CASCADE")
     )
     exercises: Mapped[list["ProgramExercise"]] = relationship(
-        "ProgramExercise", lazy="selectin"
+        "ProgramExercise", lazy="selectin", cascade="all, delete"
     )
     user_id: Mapped[int] = mapped_column(nullable=False)
 

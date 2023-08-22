@@ -1,6 +1,5 @@
-from sqlalchemy import String, ForeignKey, select, event, update, Connection
+from sqlalchemy import String, ForeignKey, event, update, Connection
 from sqlalchemy.orm import Mapped, mapped_column, relationship, Mapper
-from sqlalchemy.ext.asyncio import AsyncSession, AsyncConnection
 from .base import Base
 from .workout_exercise_sets import WorkoutExerciseSet
 
@@ -14,7 +13,7 @@ class WorkoutExercise(Base):
         ForeignKey("workouts.id", ondelete="CASCADE")
     )
     sets: Mapped[list[WorkoutExerciseSet]] = relationship(
-        "WorkoutExerciseSet", lazy="selectin"
+        "WorkoutExerciseSet", lazy="selectin", cascade="all, delete"
     )
     user_id: Mapped[int] = mapped_column(nullable=False)
 
@@ -33,7 +32,6 @@ class WorkoutExercise(Base):
             .where(WorkoutExercise.id == target.workout_exercise_id)
             .values({"n_sets": WorkoutExercise.n_sets + 1})
         )
-        print("stmt: ", update_stmt)
         connection.execute(update_stmt)
 
     @staticmethod
@@ -46,6 +44,4 @@ class WorkoutExercise(Base):
             .where(WorkoutExercise.id == target.workout_exercise_id)
             .values({"n_sets": WorkoutExercise.n_sets - 1})
         )
-        print("stmt: ", update_stmt)
         connection.execute(update_stmt)
-        print("mapper: ", type(mapper))
