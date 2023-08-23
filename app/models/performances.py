@@ -1,7 +1,12 @@
-from sqlalchemy import String, ForeignKey, Float
+from typing import Self
+from fastapi.security import HTTPAuthorizationCredentials
+from sqlalchemy import String, ForeignKey, Float, select, update
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.ext.asyncio import AsyncSession
+from .. import oauth2
 from .base import Base
-from .progressions import Progression
+from ..schemas import performances_schemas
+from ..utils import generic_operations
 
 
 class Performance(Base):
@@ -18,3 +23,31 @@ class Performance(Base):
 
     def __repr__(self) -> str:
         return f"Performance(date={self.date}, weight={self.weight}, ...)"
+
+    @classmethod
+    async def add_performance(
+        cls,
+        performance_in: performances_schemas.PerformanceInSchema,
+        credentials: HTTPAuthorizationCredentials,
+        session: AsyncSession,
+    ) -> Self:
+        credentials_id = oauth2.decode_token(credentials.credentials)
+        select_by_date_stmt = select(cls).where(cls.date == performance_in.date)
+        exec = await session.execute(select_by_date_stmt)
+        performance = exec.scalars().first()
+
+        if performance is not None:
+            update_stmt = (
+                update(cls)
+                .where(cls.id == performance.id)
+                .values({"weight": performance_in.weight})
+                .returning(cls)
+            )
+            exec = await session.execute(update_stmt)
+            await session.commit()
+            updated_performance = exec.scalars().first()
+            return updated_performance
+
+        created_performance = cls(**performance_in.model_dump(), user_id=credentials_id)
+        await generic_operations.add_to_db(created_performance, session)
+        return created_performance

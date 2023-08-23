@@ -1,6 +1,5 @@
 from typing import Self, Sequence
 import datetime
-from fastapi import Response
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import String, ForeignKey, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -76,12 +75,14 @@ class Workout(Base):
         select_stmt = select(cls).where(cls.id == workout_id)
         exec = await session.execute(select_stmt)
         workout = exec.scalars().first()
+
         if workout is None:
             raise generic_exceptions.NOT_FOUND_EXCEPTION("Workout", workout_id)
         if workout.user_id != user_id:
             raise generic_exceptions.FORBIDDEN_EXCEPTION
         await session.delete(workout)
         await session.commit()
+
         return {"date": workout.date, "day": workout.day}
 
 
@@ -90,8 +91,10 @@ async def execute(
 ) -> Workout | None:
     exec = await session.execute(select_stmt)
     workout = exec.scalars().first()
+
     if workout is None:
         return None
     if workout.user_id != credentials_id:
         raise generic_exceptions.FORBIDDEN_EXCEPTION
+
     return workout

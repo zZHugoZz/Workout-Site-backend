@@ -14,13 +14,16 @@ router = APIRouter(prefix="/performances", tags=["Performances"])
     response_model=performances_schemas.PerformanceSchema,
 )
 async def create_performance(
-    performance: performances_schemas.PerformanceInSchema, params: common_deps
+    performance_in: performances_schemas.PerformanceInSchema, params: common_deps
 ):
-    return await generic_operations.create_item(
-        params[Dependencies.CREDENTIALS],
-        params[Dependencies.DB],
-        performances.Performance,
-        performance,
+    # return await generic_operations.create_item(
+    #     params[Dependencies.CREDENTIALS],
+    #     params[Dependencies.DB],
+    #     performances.Performance,
+    #     performance,
+    # )
+    return await performances.Performance.add_performance(
+        performance_in, params[Dependencies.CREDENTIALS], params[Dependencies.DB]
     )
 
 
