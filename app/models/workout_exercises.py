@@ -1,9 +1,12 @@
+from typing import TYPE_CHECKING
 from sqlalchemy import String, ForeignKey, event, select, update, Connection
 from sqlalchemy.orm import Mapped, mapped_column, relationship, Mapper
 from .base import Base
-from .workout_exercise_sets import WorkoutExerciseSet
 from .workouts import Workout
 from ..utils import generic_exceptions
+
+if TYPE_CHECKING:
+    from .workout_exercise_sets import WorkoutExerciseSet
 
 
 class WorkoutExercise(Base):
@@ -14,7 +17,7 @@ class WorkoutExercise(Base):
     workout_id: Mapped[int] = mapped_column(
         ForeignKey("workouts.id", ondelete="CASCADE")
     )
-    sets: Mapped[list[WorkoutExerciseSet]] = relationship(
+    sets: Mapped[list["WorkoutExerciseSet"]] = relationship(
         "WorkoutExerciseSet", lazy="selectin", cascade="all, delete"
     )
     user_id: Mapped[int] = mapped_column(nullable=False)
@@ -26,32 +29,6 @@ class WorkoutExercise(Base):
 
 
 class WorkoutExerciseEvents:
-    @staticmethod
-    @event.listens_for(WorkoutExerciseSet, "after_insert")
-    def increment_n_sets(
-        mapper: Mapper, connection: Connection, target: WorkoutExerciseSet
-    ) -> None:
-        print("increment")
-        update_stmt = (
-            update(WorkoutExercise)
-            .where(WorkoutExercise.id == target.workout_exercise_id)
-            .values({"n_sets": WorkoutExercise.n_sets + 1})
-        )
-        connection.execute(update_stmt)
-
-    @staticmethod
-    @event.listens_for(WorkoutExerciseSet, "after_delete")
-    def decrement_n_sets(
-        mapper: Mapper, connection: Connection, target: WorkoutExerciseSet
-    ) -> None:
-        print("decrement")
-        update_stmt = (
-            update(WorkoutExercise)
-            .where(WorkoutExercise.id == target.workout_exercise_id)
-            .values({"n_sets": WorkoutExercise.n_sets - 1})
-        )
-        connection.execute(update_stmt)
-
     @staticmethod
     @event.listens_for(WorkoutExercise, "before_insert")
     def check_for_authorization(
