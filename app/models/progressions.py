@@ -18,7 +18,7 @@ class Progression(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped[User] = relationship("User")
     performances: Mapped[list["Performance"]] = relationship(
-        "Performance", lazy="selectin"
+        "Performance", back_populates="progression", lazy="selectin"
     )
 
     def __repr__(self) -> str:

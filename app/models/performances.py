@@ -1,12 +1,13 @@
 from typing import Self
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import String, ForeignKey, Float, select, update
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncSession
 from .. import oauth2
 from .base import Base
 from ..schemas import performances_schemas
-from ..utils import generic_operations
+from ..utils import generic_operations, generic_exceptions
+from .progressions import Progression
 
 
 class Performance(Base):
@@ -18,6 +19,9 @@ class Performance(Base):
     weight: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
     progression_id: Mapped[int] = mapped_column(
         ForeignKey("progressions.id", ondelete="CASCADE")
+    )
+    progression: Mapped[Progression] = relationship(
+        "Progression", back_populates="performances", lazy="selectin"
     )
     user_id: Mapped[int] = mapped_column(nullable=False)
 
@@ -37,6 +41,9 @@ class Performance(Base):
         performance = exec.scalars().first()
 
         if performance is not None:
+            if performance.progression.user_id != credentials_id:
+                raise generic_exceptions.FORBIDDEN_EXCEPTION
+
             update_stmt = (
                 update(cls)
                 .where(cls.id == performance.id)
@@ -49,5 +56,8 @@ class Performance(Base):
             return updated_performance
 
         created_performance = cls(**performance_in.model_dump(), user_id=credentials_id)
+        if created_performance.progression.user_id != credentials_id:
+            raise generic_exceptions.FORBIDDEN_EXCEPTION
+
         await generic_operations.add_to_db(created_performance, session)
         return created_performance
