@@ -1,4 +1,4 @@
-from typing import Self, Sequence
+from typing import Self, Sequence, TYPE_CHECKING
 import datetime
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import String, ForeignKey, select
@@ -8,7 +8,9 @@ from ..utils import generic_exceptions
 from .. import oauth2
 from .base import Base
 from .users import User
-from .workout_exercises import WorkoutExercise
+
+if TYPE_CHECKING:
+    from .workout_exercises import WorkoutExercise
 
 
 class Workout(Base):
@@ -22,7 +24,7 @@ class Workout(Base):
     year: Mapped[int] = mapped_column(nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped[User] = relationship("User")
-    exercises: Mapped[list[WorkoutExercise]] = relationship(
+    exercises: Mapped[list["WorkoutExercise"]] = relationship(
         "WorkoutExercise", lazy="selectin", cascade="all, delete"
     )
 

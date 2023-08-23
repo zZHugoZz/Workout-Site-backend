@@ -1,5 +1,4 @@
 from fastapi import status, APIRouter
-from ..models.workouts import Workout
 from ..models.programs import Program
 from ..models.progressions import Progression
 from ..models import units, workouts

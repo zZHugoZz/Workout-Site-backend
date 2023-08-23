@@ -1,7 +1,9 @@
-from sqlalchemy import String, ForeignKey, event, update, Connection
+from sqlalchemy import String, ForeignKey, event, select, update, Connection
 from sqlalchemy.orm import Mapped, mapped_column, relationship, Mapper
 from .base import Base
 from .workout_exercise_sets import WorkoutExerciseSet
+from .workouts import Workout
+from ..utils import generic_exceptions
 
 
 class WorkoutExercise(Base):
@@ -22,11 +24,14 @@ class WorkoutExercise(Base):
             f"WorkoutExercise(id={self.id}, name={self.name}, nsets={self.n_sets}, ...)"
         )
 
+
+class WorkoutExerciseEvents:
     @staticmethod
     @event.listens_for(WorkoutExerciseSet, "after_insert")
     def increment_n_sets(
         mapper: Mapper, connection: Connection, target: WorkoutExerciseSet
     ) -> None:
+        print("increment")
         update_stmt = (
             update(WorkoutExercise)
             .where(WorkoutExercise.id == target.workout_exercise_id)
@@ -39,9 +44,20 @@ class WorkoutExercise(Base):
     def decrement_n_sets(
         mapper: Mapper, connection: Connection, target: WorkoutExerciseSet
     ) -> None:
+        print("decrement")
         update_stmt = (
             update(WorkoutExercise)
             .where(WorkoutExercise.id == target.workout_exercise_id)
             .values({"n_sets": WorkoutExercise.n_sets - 1})
         )
         connection.execute(update_stmt)
+
+    @staticmethod
+    @event.listens_for(WorkoutExercise, "before_insert")
+    def check_for_authorization(
+        mapper: Mapper, connection: Connection, target: WorkoutExercise
+    ) -> None:
+        select_stmt = select(Workout).where(Workout.id == target.workout_id)
+        workout = connection.execute(select_stmt).first()
+        if workout.user_id != target.user_id:
+            raise generic_exceptions.FORBIDDEN_EXCEPTION
