@@ -2,10 +2,11 @@ from typing import Sequence
 from fastapi import Response, status
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel
-from sqlalchemy import select, update
+from sqlalchemy import select, update, Connection
 from sqlalchemy.ext.asyncio import AsyncSession
 from .. import oauth2
-from .generic_exceptions import NOT_FOUND_EXCEPTION, FORBIDDEN_EXCEPTION
+from . import generic_exceptions
+from ..models.base import Base
 
 
 async def get_items(
@@ -31,9 +32,9 @@ async def get_item(
     item = exec.scalars().first()
 
     if item is None:
-        raise NOT_FOUND_EXCEPTION(model_name, id)
+        raise generic_exceptions.NOT_FOUND_EXCEPTION(model_name, id)
     if item.user_id != user_id:
-        raise FORBIDDEN_EXCEPTION
+        raise generic_exceptions.FORBIDDEN_EXCEPTION
     return item
 
 
@@ -67,9 +68,9 @@ async def delete_item(
     item_to_delete = exec.scalars().first()
 
     if item_to_delete is None:
-        raise NOT_FOUND_EXCEPTION(model_name, id)
+        raise generic_exceptions.NOT_FOUND_EXCEPTION(model_name, id)
     if item_to_delete.user_id != user_id:
-        raise FORBIDDEN_EXCEPTION
+        raise generic_exceptions.FORBIDDEN_EXCEPTION
 
     await session.delete(item_to_delete)
     await session.commit()
@@ -90,9 +91,9 @@ async def update_item(
     item_to_update = exec.scalars().first()
 
     if item_to_update is None:
-        raise NOT_FOUND_EXCEPTION(model_name, id)
+        raise generic_exceptions.NOT_FOUND_EXCEPTION(model_name, id)
     if item_to_update.user_id != user_id:
-        raise FORBIDDEN_EXCEPTION
+        raise generic_exceptions.FORBIDDEN_EXCEPTION
 
     update_stmt = update(model).values(updated_item.model_dump()).returning(model)
     exec = await session.execute(update_stmt)
@@ -105,3 +106,16 @@ async def add_to_db(created_item, session: AsyncSession):
     session.add(created_item)
     await session.commit()
     await session.refresh(created_item)
+
+
+def check_authorization(
+    target: Base, parent_class: Base, parent_id: int, connection: Connection
+) -> None:
+    """
+    checks if the user that created the instance corresponds to the one who
+    created the corresponding parent instance
+    """
+    select_stmt = select(parent_class).where(parent_class.id == parent_id)
+    parent = connection.execute(select_stmt).first()
+    if parent.user_id != target.user_id:
+        raise generic_exceptions.FORBIDDEN_EXCEPTION

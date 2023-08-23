@@ -1,9 +1,9 @@
 from typing import TYPE_CHECKING
-from sqlalchemy import String, ForeignKey, event, select, update, Connection
+from sqlalchemy import String, ForeignKey, event, Connection
 from sqlalchemy.orm import Mapped, mapped_column, relationship, Mapper
 from .base import Base
 from .workouts import Workout
-from ..utils import generic_exceptions
+from ..utils import generic_operations
 
 if TYPE_CHECKING:
     from .workout_exercise_sets import WorkoutExerciseSet
@@ -31,10 +31,9 @@ class WorkoutExercise(Base):
 class WorkoutExerciseEvents:
     @staticmethod
     @event.listens_for(WorkoutExercise, "before_insert")
-    def check_for_authorization(
+    def add_workout_exercise_auth(
         mapper: Mapper, connection: Connection, target: WorkoutExercise
     ) -> None:
-        select_stmt = select(Workout).where(Workout.id == target.workout_id)
-        workout = connection.execute(select_stmt).first()
-        if workout.user_id != target.user_id:
-            raise generic_exceptions.FORBIDDEN_EXCEPTION
+        generic_operations.check_authorization(
+            target, Workout, target.workout_id, connection
+        )
