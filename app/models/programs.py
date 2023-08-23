@@ -1,8 +1,11 @@
+from typing import TYPE_CHECKING
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 from .users import User
-from .program_days import ProgramDay
+
+if TYPE_CHECKING:
+    from .program_days import ProgramDay
 
 
 class Program(Base):
@@ -17,7 +20,7 @@ class Program(Base):
     n_days: Mapped[int] = mapped_column(nullable=False, server_default="7")
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped[User] = relationship("User", lazy="selectin")
-    days: Mapped[list[ProgramDay]] = relationship(
+    days: Mapped[list["ProgramDay"]] = relationship(
         "ProgramDay", lazy="selectin", cascade="all, delete"
     )
 

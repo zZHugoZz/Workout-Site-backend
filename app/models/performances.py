@@ -8,6 +8,7 @@ from .base import Base
 from ..schemas import performances_schemas
 from ..utils import generic_operations, generic_exceptions
 from .progressions import Progression
+from ..utils import generic_operations
 
 
 class Performance(Base):
@@ -56,8 +57,18 @@ class Performance(Base):
             return updated_performance
 
         created_performance = cls(**performance_in.model_dump(), user_id=credentials_id)
-        if created_performance.progression.user_id != credentials_id:
+        select_parent_stmt = select(Progression).where(
+            Progression.id == created_performance.progression_id
+        )
+        exec = await session.execute(select_parent_stmt)
+        progression = exec.scalars().first()
+
+        if progression.user_id != credentials_id:
             raise generic_exceptions.FORBIDDEN_EXCEPTION
 
         await generic_operations.add_to_db(created_performance, session)
         return created_performance
+
+
+class PerformanceEvents:
+    pass

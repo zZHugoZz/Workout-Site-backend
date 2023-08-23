@@ -1,6 +1,8 @@
-from sqlalchemy import ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey, String, event, Connection
+from sqlalchemy.orm import Mapped, mapped_column, Mapper
 from .base import Base
+from .program_days import ProgramDay
+from ..utils import generic_operations
 
 
 class ProgramExercise(Base):
@@ -18,3 +20,14 @@ class ProgramExercise(Base):
 
     def __repr__(self) -> str:
         return f"ProgramExercise(name={self.name}, min_sets={self.min_sets}, max_sets={self.max_sets}, ...)"
+
+
+class ProgramExerciseEvents:
+    @staticmethod
+    @event.listens_for(ProgramExercise, "before_insert")
+    def add_program_exercise_auth(
+        mapper: Mapper, connection: Connection, target: ProgramExercise
+    ) -> None:
+        generic_operations.check_authorization(
+            target, ProgramDay, target.day_id, connection
+        )

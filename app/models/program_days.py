@@ -1,7 +1,9 @@
 from typing import TYPE_CHECKING
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey, event, Connection
+from sqlalchemy.orm import Mapped, mapped_column, relationship, Mapper
 from .base import Base
+from ..utils import generic_operations
+from .programs import Program
 
 if TYPE_CHECKING:
     from .program_exercises import ProgramExercise
@@ -21,4 +23,15 @@ class ProgramDay(Base):
     def __repr__(self) -> str:
         return (
             f"ProgramDay(program_id={self.program_id}, exercises={self.exercises}, ...)"
+        )
+
+
+class ProgramDayEvents:
+    @staticmethod
+    @event.listens_for(ProgramDay, "before_insert")
+    def add_program_day_auth(
+        mapper: Mapper, connection: Connection, target: ProgramDay
+    ) -> None:
+        generic_operations.check_authorization(
+            target, Program, target.program_id, connection
         )
