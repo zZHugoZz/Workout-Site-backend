@@ -18,7 +18,7 @@ class Dependencies(LowercaseStrEnum):
 def get_credendials_and_db(
     credentials: HTTPAuthorizationCredentials = Security(security),
     db: AsyncSession = Depends(get_db),
-):
+) -> dict[str, any]:
     return {Dependencies.CREDENTIALS: credentials, Dependencies.DB: db}
 
 

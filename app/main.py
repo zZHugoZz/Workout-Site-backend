@@ -21,7 +21,6 @@ from .routers import (
 )
 
 
-# base.Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Workout site")
 origins = ["*"]
 app.add_middleware(

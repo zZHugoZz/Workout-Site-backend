@@ -26,7 +26,7 @@ def encode_token(user_id: int) -> bytes:
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
-def decode_token(token: any) -> Mapping:
+def decode_token(token: str) -> int:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         if payload["scope"] != "access_token":
@@ -57,7 +57,9 @@ def encode_refresh_token(user_id: int) -> bytes:
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
-async def get_new_access_token(refresh_token: any, session: AsyncSession) -> dict:
+async def get_new_access_token(
+    refresh_token: str, session: AsyncSession
+) -> dict[str, bytes]:
     try:
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         if payload["scope"] != "refresh_token":

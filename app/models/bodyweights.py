@@ -1,7 +1,6 @@
 from sqlalchemy import Float, String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
-from .users import User
 
 
 class BodyWeight(Base):

@@ -1,4 +1,4 @@
-from typing import Self
+from typing import Self, Sequence
 from sqlalchemy import String, select
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,7 +15,7 @@ class Exercise(Base):
         return f"Exercise(name={self.name}, link={self.link}, ...)"
 
     @classmethod
-    async def get_exercises(cls, session: AsyncSession) -> list[Self | None]:
+    async def get_exercises(cls, session: AsyncSession) -> Sequence[Self | None]:
         select_stmt = select(cls)
         exec = await session.execute(select_stmt)
         exercises = exec.scalars().all()

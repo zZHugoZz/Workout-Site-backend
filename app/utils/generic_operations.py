@@ -1,4 +1,5 @@
-from typing import Sequence
+from dataclasses import dataclass
+from typing import Callable, Sequence
 from fastapi import Response, status
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel
@@ -12,8 +13,8 @@ from ..models.base import Base
 async def get_items(
     credentials: HTTPAuthorizationCredentials, session: AsyncSession, model
 ) -> Sequence:
-    user_id = oauth2.decode_token(credentials.credentials)
-    query = select(model).where(model.user_id == user_id)
+    credentials_id = oauth2.decode_token(credentials.credentials)
+    query = select(model).where(model.user_id == credentials_id)
     exec = await session.execute(query)
     items = exec.scalars().all()
     return items
