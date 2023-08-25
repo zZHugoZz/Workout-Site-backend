@@ -1,12 +1,13 @@
 from typing import Self, TYPE_CHECKING
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import EmailStr
-from sqlalchemy import String, ForeignKey, select, update
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Float, String, ForeignKey, select, update, event, Connection
+from sqlalchemy.orm import Mapped, mapped_column, relationship, Mapper
 from sqlalchemy.dialects.postgresql import BYTEA
 from sqlalchemy.ext.asyncio import AsyncSession
 from .base import Base
 from .. import oauth2
+from .bodyweights import BodyWeight
 
 if TYPE_CHECKING:
     from .users import User
@@ -20,6 +21,7 @@ class Profile(Base):
     age: Mapped[int] = mapped_column(nullable=True)
     gender: Mapped[str] = mapped_column(String(100), nullable=True)
     profile_picture: Mapped[bytes] = mapped_column(BYTEA, nullable=True)
+    bodyweight: Mapped[float] = mapped_column(Float(precision=1), nullable=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped["User"] = relationship("User", lazy="selectin")
 
@@ -52,3 +54,19 @@ class Profile(Base):
         await session.commit()
         updated_profile = exec.scalars().first()
         return updated_profile
+
+
+class ProfileEvents:
+    @staticmethod
+    @event.listens_for(BodyWeight, "after_insert")
+    def update_bodyweight(
+        mapper: Mapper, connection: Connection, target: BodyWeight
+    ) -> None:
+        update_stmt = (
+            update(Profile)
+            .where(Profile.user_id == target.user_id)
+            .values({"bodyweight": target.weight})
+            .returning(Profile)
+        )
+        connection.execute(update_stmt)
+        connection.commit()
