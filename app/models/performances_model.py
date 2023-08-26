@@ -4,10 +4,10 @@ from sqlalchemy import String, ForeignKey, Float, select, update
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncSession
 from .. import oauth2
-from .base import Base
+from .base_model import Base
 from ..schemas import performances_schemas
 from ..utils import generic_operations, generic_exceptions
-from .progressions import Progression
+from .progressions_model import Progression
 from ..utils import generic_operations
 
 

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
 from ..schemas import performances_schemas
 from ..utils import generic_operations
-from ..models import performances
+from ..models import performances_model
 from ..dependencies import common_deps, Dependencies
 
 
@@ -22,7 +22,7 @@ async def create_performance(
     #     performances.Performance,
     #     performance,
     # )
-    return await performances.Performance.add_performance(
+    return await performances_model.Performance.add_performance(
         performance_in, params[Dependencies.CREDENTIALS], params[Dependencies.DB]
     )
 
@@ -33,6 +33,6 @@ async def delete_performance(id: int, params: common_deps):
         id,
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
-        performances.Performance,
+        performances_model.Performance,
         "Performance",
     )

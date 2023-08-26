@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status
 from ..schemas import progressions_schemas
-from ..models import progressions
+from ..models import progressions_model
 from ..utils import generic_operations
 from ..dependencies import common_deps, Dependencies
 
@@ -17,7 +17,7 @@ async def get_progressions(params: common_deps):
     return await generic_operations.get_items(
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
-        progressions.Progression,
+        progressions_model.Progression,
     )
 
 
@@ -31,7 +31,7 @@ async def get_progression(id: int, params: common_deps):
         id,
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
-        progressions.Progression,
+        progressions_model.Progression,
         "Progression",
     )
 
@@ -47,7 +47,7 @@ async def create_progression(
     return await generic_operations.create_item(
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
-        progressions.Progression,
+        progressions_model.Progression,
         progression,
     )
 
@@ -58,6 +58,6 @@ async def delete_progression(id: int, params: common_deps):
         id,
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
-        progressions.Progression,
+        progressions_model.Progression,
         "Progression",
     )

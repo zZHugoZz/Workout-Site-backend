@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import Query, status, APIRouter
-from ..models import workouts
+from ..models import workouts_model
 from ..schemas import workouts_schemas
 from ..utils import generic_operations
 from ..dependencies import common_deps, Dependencies
@@ -16,7 +16,9 @@ router = APIRouter(prefix="/workouts", tags=["Workouts"])
 )
 async def get_workouts(params: common_deps):
     return await generic_operations.get_items(
-        params[Dependencies.CREDENTIALS], params[Dependencies.DB], workouts.Workout
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        workouts_model.Workout,
     )
 
 
@@ -30,7 +32,7 @@ async def get_workout(id: int, params: common_deps):
         id,
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
-        workouts.Workout,
+        workouts_model.Workout,
         "Workout",
     )
 
@@ -39,7 +41,7 @@ async def get_workout(id: int, params: common_deps):
 async def get_workouts_by_month(
     month: Annotated[int, Query()], year: Annotated[int, Query()], params: common_deps
 ):
-    return await workouts.Workout.get_workouts_by_month(
+    return await workouts_model.Workout.get_workouts_by_month(
         month, year, params[Dependencies.CREDENTIALS], params[Dependencies.DB]
     )
 
@@ -50,7 +52,7 @@ async def get_workouts_by_month(
     response_model=workouts_schemas.WorkoutSchema | None,
 )
 async def get_workout_by_date(date: Annotated[str, Query()], params: common_deps):
-    return await workouts.Workout.get_workout_by_date(
+    return await workouts_model.Workout.get_workout_by_date(
         date, params[Dependencies.CREDENTIALS], params[Dependencies.DB]
     )
 
@@ -62,7 +64,7 @@ async def get_workout_by_date(date: Annotated[str, Query()], params: common_deps
     response_model=workouts_schemas.WorkoutSchema | None,
 )
 async def get_workout_by_current_date(params: common_deps):
-    return await workouts.Workout.get_workout_by_current_date(
+    return await workouts_model.Workout.get_workout_by_current_date(
         params[Dependencies.CREDENTIALS], params[Dependencies.DB]
     )
 
@@ -78,7 +80,7 @@ async def create_workout(
     return await generic_operations.create_item(
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
-        workouts.Workout,
+        workouts_model.Workout,
         workout,
     )
 
@@ -92,6 +94,6 @@ async def delete_workout(id: int, params: common_deps):
     #     workouts.Workout,
     #     "Workout",
     # )
-    return await workouts.Workout.delete_workout(
+    return await workouts_model.Workout.delete_workout(
         id, params[Dependencies.CREDENTIALS], params[Dependencies.DB]
     )

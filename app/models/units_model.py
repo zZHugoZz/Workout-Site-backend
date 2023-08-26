@@ -2,7 +2,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy import String, ForeignKey, select, update
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncSession
-from .base import Base
+from .base_model import Base
 from .. import oauth2
 
 

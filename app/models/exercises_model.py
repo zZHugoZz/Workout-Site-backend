@@ -2,7 +2,7 @@ from typing import Self, Sequence
 from sqlalchemy import String, select
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncSession
-from .base import Base
+from .base_model import Base
 
 
 class Exercise(Base):

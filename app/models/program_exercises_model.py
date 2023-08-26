@@ -1,7 +1,7 @@
 from sqlalchemy import ForeignKey, String, event, Connection
 from sqlalchemy.orm import Mapped, mapped_column, Mapper
-from .base import Base
-from .program_days import ProgramDay
+from .base_model import Base
+from .program_days_model import ProgramDay
 from ..utils import generic_operations
 
 

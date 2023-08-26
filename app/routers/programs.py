@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status
 from ..schemas import programs_schemas
-from ..models import programs
+from ..models import programs_model
 from ..utils import generic_operations
 from ..dependencies import common_deps, Dependencies
 
@@ -15,7 +15,9 @@ router = APIRouter(prefix="/programs", tags=["Programs"])
 )
 async def get_programs(params: common_deps):
     return await generic_operations.get_items(
-        params[Dependencies.CREDENTIALS], params[Dependencies.DB], programs.Program
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        programs_model.Program,
     )
 
 
@@ -29,7 +31,7 @@ async def get_program(id: int, params: common_deps):
         id,
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
-        programs.Program,
+        programs_model.Program,
         "Program",
     )
 
@@ -45,7 +47,7 @@ async def create_program(
     return await generic_operations.create_item(
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
-        programs.Program,
+        programs_model.Program,
         program,
     )
 
@@ -56,6 +58,6 @@ async def delete_program(id: int, params: common_deps):
         id,
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
-        programs.Program,
+        programs_model.Program,
         "Program",
     )

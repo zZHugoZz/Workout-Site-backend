@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status
 from ..schemas import bodyweights_schemas
 from ..utils import generic_operations
-from ..models import bodyweights
+from ..models import bodyweights_model
 from datetime import date
 from ..dependencies import common_deps, Dependencies
 
@@ -21,7 +21,7 @@ async def create_bodyweight(
     return await generic_operations.create_item(
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
-        bodyweights.BodyWeight,
+        bodyweights_model.BodyWeight,
         bodyweight,
         current_date,
     )
@@ -36,5 +36,5 @@ async def get_bodyweights(params: common_deps):
     return await generic_operations.get_items(
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
-        bodyweights.BodyWeight,
+        bodyweights_model.BodyWeight,
     )

@@ -1,11 +1,11 @@
 from typing import TYPE_CHECKING
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from .base import Base
-from .users import User
+from .base_model import Base
+from .users_model import User
 
 if TYPE_CHECKING:
-    from .performances import Performance
+    from .performances_model import Performance
 
 
 class Progression(Base):

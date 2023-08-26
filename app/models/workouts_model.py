@@ -6,11 +6,11 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..utils import generic_exceptions
 from .. import oauth2
-from .base import Base
-from .users import User
+from .base_model import Base
+from .users_model import User
 
 if TYPE_CHECKING:
-    from .workout_exercises import WorkoutExercise
+    from .workout_exercises_model import WorkoutExercise
 
 
 class Workout(Base):

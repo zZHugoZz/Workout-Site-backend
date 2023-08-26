@@ -1,7 +1,7 @@
 from sqlalchemy import ForeignKey, Float, Connection, event, update
 from sqlalchemy.orm import Mapped, mapped_column, Mapper
-from .base import Base
-from .workout_exercises import WorkoutExercise
+from .base_model import Base
+from .workout_exercises_model import WorkoutExercise
 from ..utils import generic_operations
 
 

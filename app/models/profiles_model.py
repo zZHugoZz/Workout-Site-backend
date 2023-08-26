@@ -5,12 +5,12 @@ from sqlalchemy import Float, String, ForeignKey, select, update, event, Connect
 from sqlalchemy.orm import Mapped, mapped_column, relationship, Mapper
 from sqlalchemy.dialects.postgresql import BYTEA
 from sqlalchemy.ext.asyncio import AsyncSession
-from .base import Base
+from .base_model import Base
 from .. import oauth2
-from .bodyweights import BodyWeight
+from .bodyweights_model import BodyWeight
 
 if TYPE_CHECKING:
-    from .users import User
+    from .users_model import User
 
 
 class Profile(Base):

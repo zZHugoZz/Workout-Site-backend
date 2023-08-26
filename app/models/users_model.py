@@ -4,10 +4,10 @@ from sqlalchemy import String, select
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..utils import generic_operations, encryption
-from .base import Base
+from .base_model import Base
 from ..schemas import users_schemas
-from .profiles import Profile
-from .units import Unit
+from .profiles_model import Profile
+from .units_model import Unit
 
 
 class User(Base):

@@ -1,12 +1,12 @@
 from typing import TYPE_CHECKING
 from sqlalchemy import String, ForeignKey, event, Connection
 from sqlalchemy.orm import Mapped, mapped_column, relationship, Mapper
-from .base import Base
-from .workouts import Workout
+from .base_model import Base
+from .workouts_model import Workout
 from ..utils import generic_operations
 
 if TYPE_CHECKING:
-    from .workout_exercise_sets import WorkoutExerciseSet
+    from .workout_exercise_sets_model import WorkoutExerciseSet
 
 
 class WorkoutExercise(Base):

@@ -1,12 +1,12 @@
 from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, event, Connection
 from sqlalchemy.orm import Mapped, mapped_column, relationship, Mapper
-from .base import Base
+from .base_model import Base
 from ..utils import generic_operations
-from .programs import Program
+from .programs_model import Program
 
 if TYPE_CHECKING:
-    from .program_exercises import ProgramExercise
+    from .program_exercises_model import ProgramExercise
 
 
 class ProgramDay(Base):

@@ -1,6 +1,6 @@
 from sqlalchemy import Float, String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
-from .base import Base
+from .base_model import Base
 
 
 class BodyWeight(Base):

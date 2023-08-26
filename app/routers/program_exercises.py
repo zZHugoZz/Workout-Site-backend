@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status
 from ..schemas import program_exercises_schemas
-from ..models import program_exercises
+from ..models import program_exercises_model
 from ..utils import generic_operations
 from ..dependencies import common_deps, Dependencies
 
@@ -20,7 +20,7 @@ async def create_program_exercise(
     return await generic_operations.create_item(
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
-        program_exercises.ProgramExercise,
+        program_exercises_model.ProgramExercise,
         program_exercise,
     )
 
@@ -31,6 +31,6 @@ async def delete_program_exercise(id: int, params: common_deps):
         id,
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
-        program_exercises.ProgramExercise,
+        program_exercises_model.ProgramExercise,
         "Program exercise",
     )

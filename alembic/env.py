@@ -4,22 +4,24 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-from app.models.base import Base
+from app.models.base_model import Base
 
-from app.models.users import User
-from app.models.profiles import Profile
-from app.models.units import Unit
-from app.models.blacklisted_tokens import BlackListedToken
-from app.models.bodyweights import BodyWeight
-from app.models.exercises import Exercise
-from app.models.programs import Program
-from app.models.program_days import ProgramDay
-from app.models.program_exercises import ProgramExercise
-from app.models.progressions import Progression
-from app.models.performances import Performance
-from app.models.workouts import Workout
-from app.models.workout_exercises import WorkoutExercise
-from app.models.workout_exercise_sets import WorkoutExerciseSet
+from app.models.users_model import User
+from app.models.profiles_model import Profile
+from app.models.units_model import Unit
+from app.models.blacklisted_tokens_model import BlackListedToken
+from app.models.bodyweights_model import BodyWeight
+from app.models.exercises_model import Exercise
+from app.models.programs_model import Program
+from app.models.program_days_model import ProgramDay
+from app.models.program_exercises_model import ProgramExercise
+from app.models.progressions_model import Progression
+from app.models.performances_model import Performance
+from app.models.workouts_model import Workout
+from app.models.workout_exercises_model import WorkoutExercise
+from app.models.workout_exercise_sets_model import WorkoutExerciseSet
+from app.models.favorite_foods_model import FavoriteFood
+from app.models.recipes_model import Recipe
 from app.config import settings
 
 # this is the Alembic Config object, which provides

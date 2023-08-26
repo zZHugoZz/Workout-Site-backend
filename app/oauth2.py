@@ -5,7 +5,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from .config import settings
-from .models import blacklisted_tokens as blt
+from .models import blacklisted_tokens_model as blt
 
 
 SECRET_KEY = settings.secret_key

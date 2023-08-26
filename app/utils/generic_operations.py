@@ -7,7 +7,7 @@ from sqlalchemy import select, update, Connection
 from sqlalchemy.ext.asyncio import AsyncSession
 from .. import oauth2
 from . import generic_exceptions
-from ..models.base import Base
+from ..models.base_model import Base
 
 
 async def get_items(

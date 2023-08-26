@@ -3,7 +3,7 @@ from fastapi import Depends, status, HTTPException, APIRouter
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..models import users
+from ..models import users_model
 from ..database import get_db
 from ..schemas import tokens_schemas
 from ..utils import encryption
@@ -21,7 +21,9 @@ async def login(
     credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: AsyncSession = Depends(get_db),
 ):
-    select_stmt = select(users.User).where(users.User.email == credentials.username)
+    select_stmt = select(users_model.User).where(
+        users_model.User.email == credentials.username
+    )
     exec = await db.execute(select_stmt)
     user = exec.scalars().first()
     if not user:
