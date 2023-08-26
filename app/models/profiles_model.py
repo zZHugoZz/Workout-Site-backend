@@ -21,7 +21,6 @@ class Profile(Base):
     email: Mapped[EmailStr] = mapped_column(String(100), nullable=False)
     age: Mapped[int] = mapped_column(nullable=True)
     gender: Mapped[str] = mapped_column(String(100), nullable=True)
-    profile_picture: Mapped[bytes] = mapped_column(BYTEA, nullable=True)
     bodyweight: Mapped[float] = mapped_column(Float(precision=1), nullable=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped["User"] = relationship("User", lazy="selectin")
@@ -30,17 +29,19 @@ class Profile(Base):
     )
 
     def __repr__(self) -> str:
-        return f"Profile(id={self.id}, username={self.username}, email={self.email}, user_id={self.user_id}, user={self.user})"
+        return (
+            f"Profile(id={self.id}, username={self.username}, email={self.email}, ...)"
+        )
 
     @classmethod
     async def get_profile(
         cls, credentials: HTTPAuthorizationCredentials, session: AsyncSession
-    ) -> "Profile":
+    ) -> Self:
         credentials_id = oauth2.decode_token(credentials.credentials)
         select_stmt = select(cls).where(cls.user_id == credentials_id)
         exec = await session.execute(select_stmt)
         profile = exec.scalars().first()
-        print("user: ", profile.user)
+        print("profile: ", profile.profile_picture)
         return profile
 
     @classmethod

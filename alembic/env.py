@@ -8,6 +8,7 @@ from app.models.base_model import Base
 
 from app.models.users_model import User
 from app.models.profiles_model import Profile
+from app.models.profile_pictures_model import ProfilePicture
 from app.models.units_model import Unit
 from app.models.blacklisted_tokens_model import BlackListedToken
 from app.models.bodyweights_model import BodyWeight

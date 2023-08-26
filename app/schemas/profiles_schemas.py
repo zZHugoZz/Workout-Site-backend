@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from .users_schemas import UserOutSchema
+from .profile_pictures_schemas import ProfilePictureSchema
 
 
 class ProfileInSchema(BaseModel):
@@ -14,3 +15,4 @@ class ProfileSchema(ProfileInSchema):
     bodyweight: float | None
     user_id: int
     user: UserOutSchema
+    profile_picture: ProfilePictureSchema | None = None
