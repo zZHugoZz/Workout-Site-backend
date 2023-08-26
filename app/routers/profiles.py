@@ -23,5 +23,7 @@ async def update_profile(
     profile: profiles_schemas.ProfileInSchema, params: common_deps
 ):
     return await profiles_model.Profile.update_profile(
-        params[Dependencies.CREDENTIALS], params[Dependencies.DB], profile.model_dump()
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        profile.model_dump(exclude_unset=True),
     )
