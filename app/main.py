@@ -14,6 +14,7 @@ from .routers import (
     performances,
     units,
     profiles,
+    profile_pictures,
     bodyweights,
     workout_exercise_sets,
     manage,
@@ -34,6 +35,7 @@ app.add_middleware(
 # users
 app.include_router(users.router)
 app.include_router(profiles.router)
+app.include_router(profile_pictures.router)
 app.include_router(authentication.router)
 
 # exercises
