@@ -9,4 +9,4 @@ class BlackListedToken(Base):
     token: Mapped[str] = mapped_column(String(300), nullable=False)
 
     def __repr__(self) -> str:
-        f"BlackListedToken(id={self.id}, token={self.token})"
+        return f"BlackListedToken(id={self.id}, token={self.token})"

@@ -18,5 +18,5 @@ class FavoriteFood(Base):
     )
     user_id = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
-    def __repr__(self) -> None:
-        f"FavoriteFood(name={self.name}, calories_per_100g={self.calories_per_100g}, ...)"
+    def __repr__(self) -> str:
+        return f"FavoriteFood(name={self.name}, calories_per_100g={self.calories_per_100g}, ...)"

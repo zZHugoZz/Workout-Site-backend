@@ -20,5 +20,5 @@ class Recipe(Base):
     total_fats: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
     user_id: Mapped[int] = mapped_column(nullable=False)
 
-    def __repr__(self) -> None:
-        f"Recipe(name={self.name}, ...)"
+    def __repr__(self) -> str:
+        return f"Recipe(name={self.name}, ...)"

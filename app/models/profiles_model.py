@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .base_model import Base
 from .. import oauth2
 from .bodyweights_model import BodyWeight
+from .profile_pictures_model import ProfilePicture
 
 if TYPE_CHECKING:
     from .users_model import User
@@ -24,6 +25,9 @@ class Profile(Base):
     bodyweight: Mapped[float] = mapped_column(Float(precision=1), nullable=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped["User"] = relationship("User", lazy="selectin")
+    profile_picture: Mapped[ProfilePicture] = relationship(
+        lazy="selectin", cascade="all, delete"
+    )
 
     def __repr__(self) -> str:
         return f"Profile(id={self.id}, username={self.username}, email={self.email}, user_id={self.user_id}, user={self.user})"
