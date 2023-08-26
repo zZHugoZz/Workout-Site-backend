@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, ForeignKey, Float
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import ARRAY
 from .base_model import Base
@@ -14,10 +14,10 @@ class Recipe(Base):
     ingredients: Mapped[set[str]] = mapped_column(
         ARRAY(String, dimensions=1), nullable=False
     )
-    total_calories: Mapped[int] = mapped_column(nullable=False)
-    total_proteins: Mapped[int] = mapped_column(nullable=False)
-    total_carbs: Mapped[int] = mapped_column(nullable=False)
-    total_fats: Mapped[int] = mapped_column(nullable=False)
+    total_calories: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
+    total_proteins: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
+    total_carbs: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
+    total_fats: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
     user_id: Mapped[int] = mapped_column(nullable=False)
 
     def __repr__(self) -> None:

@@ -1,6 +1,5 @@
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import ARRAY
 from .base_model import Base
 from .recipes_model import Recipe
 
@@ -9,10 +8,10 @@ class FavoriteFood(Base):
     __tablename__ = "favorite_foods"
 
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    calories_per_100g: Mapped[int] = mapped_column(nullable=False)
-    proteins_per_100g: Mapped[int] = mapped_column(nullable=False)
-    carbs_per_100g: Mapped[int] = mapped_column(nullable=False)
-    fats_per_100g: Mapped[int] = mapped_column(nullable=False)
+    calories_per_100g: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
+    proteins_per_100g: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
+    carbs_per_100g: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
+    fats_per_100g: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
     # maybe benefits
     recipes: Mapped[list[Recipe]] = relationship(
         "Receipe", lazy="selectin", cascade="all, delete"
