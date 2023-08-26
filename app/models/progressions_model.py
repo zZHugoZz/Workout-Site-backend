@@ -16,7 +16,7 @@ class Progression(Base):
         String(100), nullable=False, server_default="#40FA84"
     )
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    user: Mapped[User] = relationship("User")
+    user: Mapped["User"] = relationship("User")
     performances: Mapped[list["Performance"]] = relationship(
         "Performance", back_populates="progression", lazy="selectin"
     )

@@ -21,7 +21,7 @@ class Performance(Base):
     progression_id: Mapped[int] = mapped_column(
         ForeignKey("progressions.id", ondelete="CASCADE")
     )
-    progression: Mapped[Progression] = relationship(
+    progression: Mapped["Progression"] = relationship(
         "Progression", back_populates="performances", lazy="selectin"
     )
     user_id: Mapped[int] = mapped_column(nullable=False)

@@ -6,7 +6,6 @@ from .profile_pictures_schemas import ProfilePictureSchema
 class ProfileInSchema(BaseModel):
     age: int | None = None
     gender: str | None = None
-    profile_picture: bytes | None = None
 
 
 class ProfileSchema(ProfileInSchema):
@@ -15,4 +14,4 @@ class ProfileSchema(ProfileInSchema):
     bodyweight: float | None
     user_id: int
     user: UserOutSchema
-    profile_picture: ProfilePictureSchema | None = None
+    profile_picture: ProfilePictureSchema | None

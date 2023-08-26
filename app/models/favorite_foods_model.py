@@ -13,7 +13,7 @@ class FavoriteFood(Base):
     carbs_per_100g: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
     fats_per_100g: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
     # maybe benefits
-    recipes: Mapped[list[Recipe]] = relationship(
+    recipes: Mapped[list["Recipe"]] = relationship(
         "Receipe", lazy="selectin", cascade="all, delete"
     )
     user_id = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
