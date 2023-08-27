@@ -17,7 +17,7 @@ router = APIRouter(prefix="/bodyweights", tags=["Body weights"])
 async def create_bodyweight(
     bodyweight: bodyweights_schemas.BodyWeightInSchema, params: common_deps
 ):
-    current_date = {"date": str(date.today())}
+    current_date = {"date": date.today()}
     return await generic_operations.create_item(
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],

@@ -73,4 +73,3 @@ class ProfileEvents:
             .returning(Profile)
         )
         connection.execute(update_stmt)
-        connection.commit()

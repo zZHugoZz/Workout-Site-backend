@@ -1,6 +1,6 @@
 from typing import Self
 from fastapi.security import HTTPAuthorizationCredentials
-from sqlalchemy import String, ForeignKey, Float, select, update
+from sqlalchemy import String, ForeignKey, Float, select, update, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncSession
 from .. import oauth2
@@ -14,9 +14,7 @@ from ..utils import generic_operations
 class Performance(Base):
     __tablename__ = "performances"
 
-    date: Mapped[str] = mapped_column(
-        String(100), nullable=False, server_default="today"
-    )
+    date = mapped_column(Date, nullable=False)
     weight: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
     progression_id: Mapped[int] = mapped_column(
         ForeignKey("progressions.id", ondelete="CASCADE")
