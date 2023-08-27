@@ -1,20 +1,19 @@
 from typing import Self
 from fastapi.security import HTTPAuthorizationCredentials
-from sqlalchemy import String, ForeignKey, Float, select, update, Date
+from sqlalchemy import ForeignKey, Float, select, update, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncSession
 from .. import oauth2
 from .base_model import Base
 from ..schemas import performances_schemas
-from ..utils import generic_operations, generic_exceptions
+from ..utils import generic_exceptions, generic_stmts
 from .progressions_model import Progression
-from ..utils import generic_operations
 
 
 class Performance(Base):
     __tablename__ = "performances"
 
-    date = mapped_column(Date, nullable=False)
+    date: Mapped[str] = mapped_column(String(100), nullable=False)
     weight: Mapped[float] = mapped_column(Float(precision=1), nullable=False)
     progression_id: Mapped[int] = mapped_column(
         ForeignKey("progressions.id", ondelete="CASCADE")
@@ -36,8 +35,9 @@ class Performance(Base):
     ) -> Self:
         credentials_id = oauth2.decode_token(credentials.credentials)
         select_by_date_stmt = select(cls).where(cls.date == performance_in.date)
-        exec = await session.execute(select_by_date_stmt)
-        performance = exec.scalars().first()
+        performance: Performance = await generic_stmts.exec_select_stmt(
+            select_by_date_stmt, session
+        )
 
         if performance is not None:
             if performance.progression.user_id != credentials_id:
@@ -49,22 +49,20 @@ class Performance(Base):
                 .values({"weight": performance_in.weight})
                 .returning(cls)
             )
-            exec = await session.execute(update_stmt)
-            await session.commit()
-            updated_performance = exec.scalars().first()
-            return updated_performance
+            return await generic_stmts.exec_update_stmt(update_stmt, session)
 
         created_performance = cls(**performance_in.model_dump(), user_id=credentials_id)
         select_parent_stmt = select(Progression).where(
             Progression.id == created_performance.progression_id
         )
-        exec = await session.execute(select_parent_stmt)
-        progression = exec.scalars().first()
+        progression: Progression = await generic_stmts.exec_select_stmt(
+            select_parent_stmt, session
+        )
 
         if progression.user_id != credentials_id:
             raise generic_exceptions.FORBIDDEN_EXCEPTION
 
-        await generic_operations.add_to_db(created_performance, session)
+        await generic_stmts.add_to_db(created_performance, session)
         return created_performance
 
 

@@ -1,12 +1,11 @@
-from dataclasses import dataclass
-from typing import Callable, Sequence
+from typing import Sequence
 from fastapi import Response, status
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from sqlalchemy import select, update, Connection
 from sqlalchemy.ext.asyncio import AsyncSession
 from .. import oauth2
-from . import generic_exceptions
+from . import generic_exceptions, generic_stmts
 from ..models.base_model import Base
 
 
@@ -52,7 +51,7 @@ async def create_item(
         if data is not None
         else model(**additional_data, user_id=user_id)
     )
-    await add_to_db(created_item, session)
+    await generic_stmts.add_to_db(created_item, session)
     return created_item
 
 
@@ -103,19 +102,9 @@ async def update_item(
     return updated_model
 
 
-async def add_to_db(created_item, session: AsyncSession):
-    session.add(created_item)
-    await session.commit()
-    await session.refresh(created_item)
-
-
 def check_authorization(
     target: Base, parent_class: Base, parent_id: int, connection: Connection
 ) -> None:
-    """
-    checks if the user that created the instance corresponds to the one who
-    created the corresponding parent instance
-    """
     select_stmt = select(parent_class).where(parent_class.id == parent_id)
     parent = connection.execute(select_stmt).first()
     if parent.user_id != target.user_id:
