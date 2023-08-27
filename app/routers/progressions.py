@@ -28,11 +28,11 @@ async def get_progressions(params: common_deps):
 )
 async def get_progression(id: int, params: common_deps):
     return await generic_operations.get_item(
-        id,
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
         progressions_model.Progression,
         "Progression",
+        id,
     )
 
 

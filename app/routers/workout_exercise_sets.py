@@ -15,11 +15,11 @@ router = APIRouter(prefix="/workout_exercise_sets", tags=["Workout exercise sets
 )
 async def get_workout_exercise_set(id: int, params: common_deps):
     return await generic_operations.get_item(
-        id,
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
         workout_exercise_sets_model.WorkoutExerciseSet,
         "Workout exercise set",
+        id,
     )
 
 

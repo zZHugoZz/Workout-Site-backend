@@ -18,19 +18,22 @@ async def get_items(
 
 
 async def get_item(
-    id: int,
     credentials: HTTPAuthorizationCredentials,
     session: AsyncSession,
     model,
     model_name: str,
+    id: int = None,
 ) -> any:
-    user_id = oauth2.decode_token(credentials.credentials)
-    select_stmt = select(model).where(model.id == id)
+    credentials_id = oauth2.decode_token(credentials.credentials)
+    if id is not None:
+        select_stmt = select(model).where(model.id == id)
+    else:
+        select_stmt = select(model).where(model.user_id == credentials_id)
     item = await generic_stmts.exec_select_stmt(select_stmt, session)
 
     if item is None:
         raise generic_exceptions.NOT_FOUND_EXCEPTION(model_name, id)
-    if item.user_id != user_id:
+    if item.user_id != credentials_id:
         raise generic_exceptions.FORBIDDEN_EXCEPTION
     return item
 

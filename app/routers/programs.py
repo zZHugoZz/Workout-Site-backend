@@ -28,11 +28,11 @@ async def get_programs(params: common_deps):
 )
 async def get_program(id: int, params: common_deps):
     return await generic_operations.get_item(
-        id,
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
         programs_model.Program,
         "Program",
+        id,
     )
 
 

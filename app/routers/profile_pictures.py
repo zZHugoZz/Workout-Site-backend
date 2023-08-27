@@ -6,6 +6,7 @@ from googleapiclient.http import MediaIoBaseUpload
 from app.models import profile_pictures_model
 from .. import config
 from ..dependencies import Dependencies, common_deps
+from ..utils import generic_operations
 
 
 router = APIRouter(prefix="/profile_pictures", tags=["Profile pictures"])
@@ -34,4 +35,4 @@ async def upload_profile_picture(file_in: UploadFile, params: common_deps):
 
 @router.get("/", status_code=status.HTTP_200_OK)
 async def get_profile_picture(params: common_deps):
-    pass
+    profile_picture = await generic_operations.get_item()

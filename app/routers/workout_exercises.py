@@ -28,11 +28,11 @@ async def get_workout_exercises(params: common_deps):
 )
 async def get_workout_exercise(id: int, params: common_deps):
     return await generic_operations.get_item(
-        id,
         params[Dependencies.CREDENTIALS],
         params[Dependencies.DB],
         workout_exercises_model.WorkoutExercise,
         "Workout exercise",
+        id,
     )
 
 
