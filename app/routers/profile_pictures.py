@@ -35,4 +35,9 @@ async def upload_profile_picture(file_in: UploadFile, params: common_deps):
 
 @router.get("/", status_code=status.HTTP_200_OK)
 async def get_profile_picture(params: common_deps):
-    profile_picture = await generic_operations.get_item()
+    profile_picture = await generic_operations.get_item(
+        params[Dependencies.CREDENTIALS],
+        params[Dependencies.DB],
+        profile_pictures_model.ProfilePicture,
+        "Profile picture",
+    )

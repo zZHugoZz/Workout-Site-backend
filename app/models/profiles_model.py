@@ -33,17 +33,6 @@ class Profile(Base):
         )
 
     @classmethod
-    async def get_profile(
-        cls, credentials: HTTPAuthorizationCredentials, session: AsyncSession
-    ) -> Self:
-        credentials_id = oauth2.decode_token(credentials.credentials)
-        select_stmt = select(cls).where(cls.user_id == credentials_id)
-        exec = await session.execute(select_stmt)
-        profile = exec.scalars().first()
-        print("profile: ", profile.profile_picture)
-        return profile
-
-    @classmethod
     async def update_profile(
         cls,
         credentials: HTTPAuthorizationCredentials,
