@@ -13,10 +13,8 @@ async def get_items(
     credentials: HTTPAuthorizationCredentials, session: AsyncSession, model
 ) -> Sequence:
     credentials_id = oauth2.decode_token(credentials.credentials)
-    query = select(model).where(model.user_id == credentials_id)
-    exec = await session.execute(query)
-    items = exec.scalars().all()
-    return items
+    select_stmt = select(model).where(model.user_id == credentials_id)
+    return await generic_stmts.exec_select_stmt(select_stmt, session, all=True)
 
 
 async def get_item(
@@ -27,9 +25,8 @@ async def get_item(
     model_name: str,
 ) -> any:
     user_id = oauth2.decode_token(credentials.credentials)
-    query = select(model).where(model.id == id)
-    exec = await session.execute(query)
-    item = exec.scalars().first()
+    select_stmt = select(model).where(model.id == id)
+    item = await generic_stmts.exec_select_stmt(select_stmt, session)
 
     if item is None:
         raise generic_exceptions.NOT_FOUND_EXCEPTION(model_name, id)
@@ -64,8 +61,7 @@ async def delete_item(
 ) -> Response:
     user_id = oauth2.decode_token(credentials.credentials)
     select_stmt = select(model).where(model.id == id)
-    exec = await session.execute(select_stmt)
-    item_to_delete = exec.scalars().first()
+    item_to_delete = await generic_stmts.exec_select_stmt(select_stmt, session)
 
     if item_to_delete is None:
         raise generic_exceptions.NOT_FOUND_EXCEPTION(model_name, id)
@@ -87,8 +83,7 @@ async def update_item(
 ) -> any:
     user_id = oauth2.decode_token(credentials.credentials)
     select_stmt = select(model).where(model.id == id)
-    exec = await session.execute(select_stmt)
-    item_to_update = exec.scalars().first()
+    item_to_update = await generic_stmts.exec_select_stmt(select_stmt, session)
 
     if item_to_update is None:
         raise generic_exceptions.NOT_FOUND_EXCEPTION(model_name, id)
@@ -96,10 +91,7 @@ async def update_item(
         raise generic_exceptions.FORBIDDEN_EXCEPTION
 
     update_stmt = update(model).values(updated_item.model_dump()).returning(model)
-    exec = await session.execute(update_stmt)
-    await session.commit()
-    updated_model = exec.scalars().first()
-    return updated_model
+    return await generic_stmts.exec_update_stmt(update_stmt, session)
 
 
 def check_authorization(

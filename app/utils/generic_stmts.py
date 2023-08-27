@@ -8,10 +8,15 @@ async def exec_update_stmt(update_stmt: any, session: AsyncSession) -> any:
     return updated_item
 
 
-async def exec_select_stmt(select_stmt: any, session: AsyncSession) -> any:
+async def exec_select_stmt(
+    select_stmt: any, session: AsyncSession, all: bool = False
+) -> any:
     exec = await session.execute(select_stmt)
     await session.commit()
-    selected_item = exec.scalars().first()
+    if all:
+        selected_item = exec.scalars().all()
+    else:
+        selected_item = exec.scalars().first()
     return selected_item
 
 
