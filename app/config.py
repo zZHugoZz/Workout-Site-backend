@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     refresh_token_expire_minutes: int
 
     spoonacular_api_key: str
+    google_json_credentials_path: str
 
 
 settings = Settings()
